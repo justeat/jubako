@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">Jubako Examples</string>
+    <string name="button_sample_hello">Hello</string>
+    <string name="button_sample_simple_carousels">Simple Carousels</string>
+</resources>

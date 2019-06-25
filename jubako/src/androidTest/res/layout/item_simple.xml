@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:tools="http://schemas.android.com/tools"
+             android:layout_width="match_parent"
+             android:layout_height="64dp"
+             android:background="@android:color/background_dark">
+
+    <TextView
+        android:id="@+id/itemText"
+        style="@style/TextAppearance.AppCompat.Title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="2dp"
+        android:background="@android:color/background_light"
+        android:gravity="center"
+        android:textColor="@android:color/black"
+        tools:text="Lorem Ipsum"/>
+</FrameLayout>

@@ -20,7 +20,7 @@ import org.mockito.Mock
 import org.mockito.Mockito.*
 import org.mockito.MockitoAnnotations.initMocks
 
-class ContentTest {
+class JubakoTest {
 
     @Rule
     @JvmField

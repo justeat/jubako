@@ -6,7 +6,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.mockito.Mockito.mock
 
-class SimpleContentAssemblerTest {
+class SimpleJubakoAssemblerTest {
     @Test
     @Throws(Exception::class)
     fun assemble_returns_list_from_constructor_delegate() {

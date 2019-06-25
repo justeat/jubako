@@ -8,7 +8,7 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 
-class PaginatedLoadingStrategyTest {
+class PaginatedContentLoadingStrategyTest {
 
     @Mock
     lateinit var lifecycleOwner: LifecycleOwner

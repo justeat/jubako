@@ -5,7 +5,8 @@ import android.util.TypedValue
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.withView
+import com.justeat.jubako.extensions.load
+import com.justeat.jubako.extensions.withView
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 
 class HelloJubakoActivity : AppCompatActivity() {

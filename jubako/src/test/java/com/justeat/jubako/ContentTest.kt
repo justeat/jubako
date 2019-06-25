@@ -3,6 +3,8 @@ package com.justeat.jubako
 import android.view.ViewGroup
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
+import com.justeat.jubako.extensions.add
+import com.justeat.jubako.extensions.descriptionProvider
 import com.nhaarman.mockitokotlin2.capture
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking

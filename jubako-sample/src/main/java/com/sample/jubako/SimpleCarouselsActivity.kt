@@ -7,7 +7,12 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
-import com.justeat.jubako.*
+import com.justeat.jubako.ContentDescription
+import com.justeat.jubako.Jubako
+import com.justeat.jubako.JubakoViewHolder
+import com.justeat.jubako.extensions.add
+import com.justeat.jubako.extensions.load
+import com.justeat.jubako.extensions.viewHolderFactory
 import com.justeat.jubako.widgets.JubakoCarouselRecyclerView
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 import kotlinx.coroutines.Dispatchers
@@ -23,18 +28,8 @@ class SimpleCarouselsActivity : AppCompatActivity() {
 
         Jubako.logger = Jubako.Logger(BuildConfig.DEBUG)
 
-        Jubako.observe(this) { state ->
-            when (state) {
-                is Jubako.State.Assembled -> {
-                    jubakoRecycler.adapter = JubakoAdapter(
-                        lifecycleOwner = this,
-                        data = state.data,
-                        // set the page size of one so we can watch each row appear
-                        loadingStrategy = PaginatedContentLoadingStrategy(1)
-                    )
-                }
-            }
-        }.load {
+        // Set page size to 1 so we can see it loading (descriptions are delayed by 500ms)
+        Jubako.into(this, jubakoRecycler, 1).load {
             for (i in 0 until 100) {
                 add {
                     ContentDescription(

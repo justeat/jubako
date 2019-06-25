@@ -1,5 +1,6 @@
 package com.justeat.jubako
 
+import com.justeat.jubako.extensions.add
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test

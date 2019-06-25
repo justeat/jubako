@@ -81,10 +81,6 @@ open class Jubako : ViewModel(), CoroutineScope {
         }
     }
 
-    fun load(descriptionProviders: MutableList<ContentDescriptionProvider<Any>>.() -> Unit) {
-        load(SimpleJubakoAssembler(descriptionProviders.apply { invoke(mutableListOf()) }))
-    }
-
     private fun completeAssemble(descriptionProviders: List<ContentDescriptionProvider<Any>>) =
         Data().apply {
             logger.log("Assembled", "${descriptionProviders.size} descriptions")
@@ -131,6 +127,20 @@ open class Jubako : ViewModel(), CoroutineScope {
                 when (state) {
                     is State.Assembled -> {
                         recycler.adapter = JubakoAdapter(activity, state.data)
+                    }
+                }
+            }
+        }
+
+        fun into(activity: FragmentActivity, recycler: JubakoRecyclerView, pageSize: Int): Jubako {
+            return observe(activity) { state ->
+                when (state) {
+                    is State.Assembled -> {
+                        recycler.adapter = JubakoAdapter(
+                            lifecycleOwner = activity,
+                            data = state.data,
+                            loadingStrategy = PaginatedContentLoadingStrategy(pageSize)
+                        )
                     }
                 }
             }

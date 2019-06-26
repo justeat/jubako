@@ -22,6 +22,10 @@ class HomeActivity : AppCompatActivity() {
         sampleLoadAsync.setOnClickListener {
             startActivity(Intent(this, LoadAsyncActivity::class.java))
         }
+
+        sampleRowUpdates.setOnClickListener {
+            startActivity(Intent(this, RowUpdatesActivity::class.java))
+        }
     }
 }
 

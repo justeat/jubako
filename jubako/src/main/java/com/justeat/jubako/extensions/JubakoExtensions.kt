@@ -8,6 +8,7 @@ import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.*
 import com.justeat.jubako.widgets.JubakoCarouselRecyclerView
+import java.util.*
 
 typealias ListReceiver = MutableList<ContentDescriptionProvider<Any>>.() -> Unit
 
@@ -79,12 +80,12 @@ fun MutableList<ContentDescriptionProvider<Any>>.addView(delegate: () -> View) {
     })
 }
 
-fun <CAROUSEL : CarouselViewHolder<ITEM, ITEM_HOLDER>, ITEM, ITEM_HOLDER : RecyclerView.ViewHolder> MutableList<ContentDescriptionProvider<Any>>.addCarousel(
+fun <ITEM, ITEM_HOLDER : RecyclerView.ViewHolder> MutableList<ContentDescriptionProvider<Any>>.addCarousel(
     layout: (parent: ViewGroup) -> View,
     @IdRes carouselRecyclerViewId: Int = NO_ID,
     items: List<ITEM>,
     priority: Int = 0,
-    layoutBinder: (CAROUSEL) -> Unit = {},
+    layoutBinder: (CarouselViewHolder<ITEM, ITEM_HOLDER>) -> Unit = {},
     itemViewHolderFactory: (parent: ViewGroup) -> ITEM_HOLDER,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM?) -> Unit = { _, _ -> }
 ) {
@@ -94,7 +95,7 @@ fun <CAROUSEL : CarouselViewHolder<ITEM, ITEM_HOLDER>, ITEM, ITEM_HOLDER : Recyc
                 CarouselViewHolder(
                     layout(it),
                     carouselRecyclerViewId,
-                    layoutBinder as ((CarouselViewHolder<ITEM, ITEM_HOLDER>) -> Unit),
+                    layoutBinder,
                     itemViewHolderFactory,
                     itemBinder
                 )
@@ -109,7 +110,7 @@ fun <CAROUSEL : CarouselViewHolder<ITEM, ITEM_HOLDER>, ITEM, ITEM_HOLDER : Recyc
     } as ContentDescriptionProvider<Any>)
 }
 
-class CarouselViewHolder<T, VH : RecyclerView.ViewHolder>(
+open class CarouselViewHolder<T, VH : RecyclerView.ViewHolder>(
     itemView: View,
     @IdRes val carouselRecyclerViewId: Int = NO_ID,
     val layoutBinder: (CarouselViewHolder<T, VH>) -> Unit = {},
@@ -142,3 +143,21 @@ class CarouselViewHolder<T, VH : RecyclerView.ViewHolder>(
 }
 
 fun pageSize(pageSize: Int) = PaginatedContentLoadingStrategy(pageSize)
+
+fun <T> MutableList<ContentDescriptionProvider<Any>>.addDescription(
+    viewHolderFactory: JubakoAdapter.HolderFactory<T>,
+    data: LiveData<T>? = null,
+    onReload: ((self: ContentDescription<T>, payload: Any?) -> Unit) = { _, _ -> },
+    priority: Int = 0,
+    id: String = UUID.randomUUID().toString()
+) {
+    add(descriptionProvider {
+        ContentDescription(
+            viewHolderFactory = viewHolderFactory,
+            data = data,
+            reset = onReload,
+            priority = priority,
+            id = id
+        )
+    })
+}

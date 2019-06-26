@@ -171,7 +171,7 @@ jubakoAdapter.reload(SOME_UNIQUE_ID)
 ```
 
 You can also reload with some arbitrary data (*payload*) that will be passed onto the
-reset function of `ContentDescription` (see `reset` in next section)
+`onReload` function of `ContentDescription` (see `onReload` in next section)
 
 ```kotlin
 jubakoAdapter.reload(SOME_UNIQUE_ID, "Hello, World!")
@@ -180,7 +180,7 @@ jubakoAdapter.reload(SOME_UNIQUE_ID, "Hello, World!")
 #### Handling a reload
 Although you can call `reload` on the `JubakoAdapter` or `JubakoViewHolder`, you still
 need to handle what happens when its called. You must implement the function
-`ContentDescription::reset` which in simplest case reassigns `ContentDescription::data`
+`ContentDescription::onReload` which in simplest case reassigns `ContentDescription::data`
 with a new `LiveData<T>` as follows:-
 
 ```kotlin
@@ -194,7 +194,7 @@ ContentDescription(
             }.run()
         }
     },
-    reset = { contentDescription, data ->
+    onReload = { contentDescription, data ->
         contentDescription.data = object : LiveData<String>() {
             override fun onActive() {
                 thread {
@@ -205,7 +205,7 @@ ContentDescription(
     })
 ```
 
-The example shows that `reset` provides a function that reassigns `data`,
+The example shows that `onReload` provides a function that reassigns `data`,
 `JubakoAdapter` will effectively call this before it observes `data` again.
 
 ## JubakoViewHolder events

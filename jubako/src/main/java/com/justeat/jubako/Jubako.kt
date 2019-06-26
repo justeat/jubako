@@ -149,7 +149,7 @@ open class Jubako : ViewModel(), CoroutineScope {
             onAssembling: () -> Unit = {},
             onAssembleError: () -> Unit = {}
         ): Jubako {
-            return observe(activity) { state ->
+            return observe(recycler.context as FragmentActivity) { state ->
                 when (state) {
                     is State.Assembled -> {
                         onAssembled(state.data)

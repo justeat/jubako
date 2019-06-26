@@ -30,7 +30,7 @@ class SimpleCarouselsActivity : AppCompatActivity() {
 
         // Set page size to 1 so we can see it loading (descriptions are delayed by 500ms)
         Jubako.into(this, jubakoRecycler, pageSize(1)).load {
-            for (i in 0 until 100) {
+            (0 until 100).forEach { i ->
                 addDescription(
                     viewHolderFactory { SimpleCarouselViewHolder(it) },
                     data = when {

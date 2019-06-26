@@ -26,7 +26,7 @@ class RowUpdatesActivity : AppCompatActivity() {
 
         Jubako.into(this, jubakoRecycler).load {
             for (i in 0 until ROWS) {
-                var hello = "Hello Jubako!"
+                var hello = "Hello Jubako! $i "
                 addDescription(
                     id = HELLO_ID + i,
                     data = object : LiveData<String>() {
@@ -55,7 +55,7 @@ class RowUpdatesActivity : AppCompatActivity() {
         var currentRow = 0
 
         fun postUpdates() {
-            sendMessageDelayed(Message.obtain().apply { what = UPDATE }, 5)
+            sendMessageDelayed(Message.obtain().apply { what = UPDATE }, 2)
         }
 
         override fun handleMessage(msg: Message) {
@@ -79,4 +79,4 @@ class RowUpdatesActivity : AppCompatActivity() {
 
 private const val HELLO_ID = "hello"
 private const val UPDATE = 1
-private const val ROWS = 10
+private const val ROWS = 20

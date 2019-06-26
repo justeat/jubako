@@ -7,10 +7,9 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
-import com.justeat.jubako.ContentDescription
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.JubakoViewHolder
-import com.justeat.jubako.extensions.add
+import com.justeat.jubako.extensions.addDescription
 import com.justeat.jubako.extensions.load
 import com.justeat.jubako.extensions.pageSize
 import com.justeat.jubako.extensions.viewHolderFactory
@@ -32,16 +31,14 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         // Set page size to 1 so we can see it loading (descriptions are delayed by 500ms)
         Jubako.into(this, jubakoRecycler, pageSize(1)).load {
             for (i in 0 until 100) {
-                add {
-                    ContentDescription(
-                        viewHolderFactory { SimpleCarouselViewHolder(it) },
-                        data = when {
-                            i % 2 == 0 -> getNumbersEnglish()
-                            else -> getNumbersJapanese()
-                        },
-                        priority = i
-                    )
-                }
+                addDescription(
+                    viewHolderFactory { SimpleCarouselViewHolder(it) },
+                    data = when {
+                        i % 2 == 0 -> getNumbersEnglish()
+                        else -> getNumbersJapanese()
+                    },
+                    priority = i
+                )
             }
         }
     }

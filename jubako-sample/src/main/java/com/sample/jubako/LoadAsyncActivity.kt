@@ -8,9 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.JubakoAdapter
-import com.justeat.jubako.extensions.loadAsync
 import com.justeat.jubako.extensions.addCarousel
+import com.justeat.jubako.extensions.loadAsync
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 
 class LoadAsyncActivity : AppCompatActivity() {
@@ -21,17 +20,13 @@ class LoadAsyncActivity : AppCompatActivity() {
 
         Jubako.logger.enabled = true
 
-        Jubako.observe(this) { state ->
-            when (state) {
-                is Jubako.State.Assembling -> {
-                    showLoading()
-                }
-                is Jubako.State.Assembled -> {
-                    showContent()
-                    jubakoRecycler.adapter = JubakoAdapter(this, state.data)
-                }
-            }
-        }.loadAsync {
+        Jubako.into(
+            activity = this,
+            recycler = jubakoRecycler,
+            onAssembling = ::showLoading,
+            onAssembled = { showContent() }).loadAsync {
+
+            // Call sleeps (by 4s) to simulate latency
             val compartments = JubakoRepository().getCompartments()
 
             for (i in 0..100) {
@@ -40,13 +35,13 @@ class LoadAsyncActivity : AppCompatActivity() {
                         layout = { layoutInflater.inflate(R.layout.simple_carousel_with_heading, it, false) },
                         carouselRecyclerViewId = R.id.jubakoCarousel,
                         priority = compartment.priority + i,
-                        items = compartment.items,
-                        itemViewHolderFactory = { SimpleCarouselItemViewHolder(it) },
                         layoutBinder = { layout ->
                             layout.itemView.findViewById<TextView>(R.id.heading).apply {
                                 text = compartment.title
                             }
                         },
+                        items = compartment.items,
+                        itemViewHolderFactory = { SimpleCarouselItemViewHolder(it) },
                         itemBinder = { holder, data -> holder.bind(data) })
                 }
             }

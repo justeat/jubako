@@ -12,6 +12,7 @@ import com.justeat.jubako.Jubako
 import com.justeat.jubako.JubakoViewHolder
 import com.justeat.jubako.extensions.add
 import com.justeat.jubako.extensions.load
+import com.justeat.jubako.extensions.pageSize
 import com.justeat.jubako.extensions.viewHolderFactory
 import com.justeat.jubako.widgets.JubakoCarouselRecyclerView
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
@@ -29,7 +30,7 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         Jubako.logger = Jubako.Logger(BuildConfig.DEBUG)
 
         // Set page size to 1 so we can see it loading (descriptions are delayed by 500ms)
-        Jubako.into(this, jubakoRecycler, 1).load {
+        Jubako.into(this, jubakoRecycler, pageSize(1)).load {
             for (i in 0 until 100) {
                 add {
                     ContentDescription(

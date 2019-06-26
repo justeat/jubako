@@ -23,12 +23,16 @@ fun Jubako.load(descriptionProviders: ListReceiver) {
  * Same as [load] but happens on the IO dispatcher (use with caution!)
  */
 fun Jubako.loadAsync(descriptionProviders: ListReceiver) {
-    load(object : JubakoAssembler {
+    load(assemble(descriptionProviders))
+}
+
+fun assemble(descriptionProviders: ListReceiver): JubakoAssembler {
+    return object : JubakoAssembler {
         override suspend fun assemble(): List<ContentDescriptionProvider<Any>> =
             mutableListOf<ContentDescriptionProvider<Any>>().apply {
                 descriptionProviders.invoke(this)
             }
-    })
+    }
 }
 
 /**
@@ -136,3 +140,5 @@ class CarouselViewHolder<T, VH : RecyclerView.ViewHolder>(
         }
     }
 }
+
+fun pageSize(pageSize: Int) = PaginatedContentLoadingStrategy(pageSize)

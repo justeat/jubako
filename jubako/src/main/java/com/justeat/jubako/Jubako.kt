@@ -122,26 +122,45 @@ open class Jubako : ViewModel(), CoroutineScope {
             return viewModel
         }
 
-        fun into(activity: FragmentActivity, recycler: JubakoRecyclerView): Jubako {
+        fun into(
+            activity: FragmentActivity,
+            recycler: JubakoRecyclerView,
+            onAssembled: (data: Data) -> Unit = {},
+            onAssembling: () -> Unit = {},
+            onAssembleError: () -> Unit = {}
+        ): Jubako {
             return observe(activity) { state ->
                 when (state) {
                     is State.Assembled -> {
+                        onAssembled(state.data)
                         recycler.adapter = JubakoAdapter(activity, state.data)
                     }
+                    is State.Assembling -> onAssembling()
+                    is State.AssembleError -> onAssembleError()
                 }
             }
         }
 
-        fun into(activity: FragmentActivity, recycler: JubakoRecyclerView, pageSize: Int): Jubako {
+        fun into(
+            activity: FragmentActivity,
+            recycler: JubakoRecyclerView,
+            loadingStrategy: ContentLoadingStrategy,
+            onAssembled: (data: Data) -> Unit = {},
+            onAssembling: () -> Unit = {},
+            onAssembleError: () -> Unit = {}
+        ): Jubako {
             return observe(activity) { state ->
                 when (state) {
                     is State.Assembled -> {
+                        onAssembled(state.data)
                         recycler.adapter = JubakoAdapter(
                             lifecycleOwner = activity,
                             data = state.data,
-                            loadingStrategy = PaginatedContentLoadingStrategy(pageSize)
+                            loadingStrategy = loadingStrategy
                         )
                     }
+                    is State.Assembling -> onAssembling()
+                    is State.AssembleError -> onAssembleError()
                 }
             }
         }

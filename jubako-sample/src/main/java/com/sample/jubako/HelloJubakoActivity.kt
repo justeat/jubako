@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.extensions.load
-import com.justeat.jubako.extensions.withView
+import com.justeat.jubako.extensions.addView
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 
 class HelloJubakoActivity : AppCompatActivity() {
@@ -19,8 +19,8 @@ class HelloJubakoActivity : AppCompatActivity() {
 
         Jubako.into(this, jubakoRecycler).load {
             for (i in 0..100) {
-                withView { textView("Hello Jubako!") }
-                withView { textView("こんにちはジュバコ") }
+                addView { textView("Hello Jubako!") }
+                addView { textView("こんにちはジュバコ") }
             }
         }
     }

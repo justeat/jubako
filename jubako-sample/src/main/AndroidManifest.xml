@@ -18,5 +18,6 @@
         </activity>
         <activity android:name=".HelloJubakoActivity"/>
         <activity android:name=".SimpleCarouselsActivity"/>
+        <activity android:name=".LoadAsyncActivity"/>
     </application>
 </manifest>

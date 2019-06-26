@@ -5,6 +5,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".HelloJubakoActivity">
+    <FrameLayout
+            android:visibility="gone"
+            android:id="@+id/loadingIndicator"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        <ProgressBar
+                android:layout_gravity="center"
+                android:layout_width="128dp"
+                android:layout_height="128dp"/>
+    </FrameLayout>
     <com.justeat.jubako.widgets.JubakoRecyclerView
             android:id="@+id/jubakoRecycler"
             android:layout_width="match_parent"

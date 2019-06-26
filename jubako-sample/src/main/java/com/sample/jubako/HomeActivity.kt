@@ -18,6 +18,10 @@ class HomeActivity : AppCompatActivity() {
         sampleSimpleCarousels.setOnClickListener {
             startActivity(Intent(this, SimpleCarouselsActivity::class.java))
         }
+
+        sampleLoadAsync.setOnClickListener {
+            startActivity(Intent(this, LoadAsyncActivity::class.java))
+        }
     }
 }
 

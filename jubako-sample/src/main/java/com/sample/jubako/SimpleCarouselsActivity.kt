@@ -33,7 +33,7 @@ class SimpleCarouselsActivity : AppCompatActivity() {
             for (i in 0 until 100) {
                 add {
                     ContentDescription(
-                        viewHolderFactory { SimpleCarouselViewHolder() },
+                        viewHolderFactory { SimpleCarouselViewHolder(it) },
                         data = when {
                             i % 2 == 0 -> getNumbersEnglish()
                             else -> getNumbersJapanese()
@@ -45,15 +45,15 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         }
     }
 
-    inner class SimpleCarouselViewHolder :
-        JubakoViewHolder<List<String>>(LayoutInflater.from(this).inflate(R.layout.simple_carousel, null)) {
+    inner class SimpleCarouselViewHolder(parent: ViewGroup) :
+        JubakoViewHolder<List<String>>(LayoutInflater.from(this).inflate(R.layout.simple_carousel, parent, false)) {
         override fun bind(data: List<String>?) {
             (itemView as JubakoCarouselRecyclerView).adapter = createAdapter(data ?: emptyList())
         }
 
         private fun createAdapter(data: List<String>): RecyclerView.Adapter<SimpleCarouselItemViewHolder> {
             return object : RecyclerView.Adapter<SimpleCarouselItemViewHolder>() {
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = SimpleCarouselItemViewHolder()
+                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = SimpleCarouselItemViewHolder(parent)
                 override fun getItemCount(): Int = data.size
                 override fun onBindViewHolder(holder: SimpleCarouselItemViewHolder, position: Int) {
                     holder.itemView.findViewById<TextView>(R.id.text).text = data[position]
@@ -62,8 +62,8 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         }
     }
 
-    inner class SimpleCarouselItemViewHolder :
-        RecyclerView.ViewHolder(LayoutInflater.from(this).inflate(R.layout.simple_carousel_item_text, null))
+    inner class SimpleCarouselItemViewHolder(parent: ViewGroup) :
+        RecyclerView.ViewHolder(LayoutInflater.from(this).inflate(R.layout.simple_carousel_item_text, parent, false))
 
     companion object {
         fun getNumbersEnglish(): LiveData<List<String>> {

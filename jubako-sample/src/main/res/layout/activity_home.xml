@@ -13,4 +13,9 @@
             android:text="@string/button_sample_simple_carousels"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+    <Button android:id="@+id/sampleLoadAsync"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sample_load_async"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 </LinearLayout>

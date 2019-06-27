@@ -65,7 +65,7 @@ class LoadAsyncActivity : AppCompatActivity() {
                         //
                         // A factory to produce item view holders
                         //
-                        itemViewHolderFactory = { SimpleCarouselItemViewHolder(it) },
+                        itemViewHolder = { SimpleCarouselItemViewHolder(it) },
                         //
                         // Perform binding of the item data to the holder
                         //
@@ -115,9 +115,7 @@ class LoadAsyncActivity : AppCompatActivity() {
         }
     }
 
-    class CustomCarouselHolder(
-        itemView: View
-    ) : CarouselViewHolder<String, SimpleCarouselItemViewHolder>(itemView) {
+    class CustomCarouselHolder(itemView: View) : CarouselViewHolder<String, SimpleCarouselItemViewHolder>(itemView) {
         val heading: TextView = itemView.findViewById(R.id.heading)
     }
 }

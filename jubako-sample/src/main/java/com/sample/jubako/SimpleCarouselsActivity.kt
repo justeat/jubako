@@ -8,12 +8,9 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.JubakoViewHolder
-import com.justeat.jubako.extensions.addDescription
+import com.justeat.jubako.extensions.addCarousel
 import com.justeat.jubako.extensions.load
 import com.justeat.jubako.extensions.pageSize
-import com.justeat.jubako.extensions.viewHolderFactory
-import com.justeat.jubako.widgets.JubakoCarouselRecyclerView
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -31,31 +28,20 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         // Set page size to 1 so we can see it loading (descriptions are delayed by 500ms)
         Jubako.into(this, jubakoRecycler, pageSize(1)).load {
             (0 until 100).forEach { i ->
-                addDescription(
-                    viewHolderFactory { SimpleCarouselViewHolder(it) },
-                    data = when {
+                addCarousel(
+                    priority = i,
+                    carouselView = {
+                        LayoutInflater.from(this@SimpleCarouselsActivity).inflate(R.layout.simple_carousel, it, false)
+                    },
+                    itemViewHolder = { SimpleCarouselItemViewHolder(it) },
+                    itemData = when {
                         i % 2 == 0 -> getNumbersEnglish()
                         else -> getNumbersJapanese()
                     },
-                    priority = i
+                    itemBinder = { holder, data ->
+                        holder.itemView.findViewById<TextView>(R.id.text).text = data
+                    }
                 )
-            }
-        }
-    }
-
-    inner class SimpleCarouselViewHolder(parent: ViewGroup) :
-        JubakoViewHolder<List<String>>(LayoutInflater.from(this).inflate(R.layout.simple_carousel, parent, false)) {
-        override fun bind(data: List<String>?) {
-            (itemView as JubakoCarouselRecyclerView).adapter = createAdapter(data ?: emptyList())
-        }
-
-        private fun createAdapter(data: List<String>): RecyclerView.Adapter<SimpleCarouselItemViewHolder> {
-            return object : RecyclerView.Adapter<SimpleCarouselItemViewHolder>() {
-                override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = SimpleCarouselItemViewHolder(parent)
-                override fun getItemCount(): Int = data.size
-                override fun onBindViewHolder(holder: SimpleCarouselItemViewHolder, position: Int) {
-                    holder.itemView.findViewById<TextView>(R.id.text).text = data[position]
-                }
             }
         }
     }

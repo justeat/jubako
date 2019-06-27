@@ -81,17 +81,23 @@ fun MutableList<ContentDescriptionProvider<Any>>.addView(delegate: () -> View) {
 }
 
 fun <HOLDER : CarouselViewHolder<ITEM, ITEM_HOLDER>, ITEM, ITEM_HOLDER : RecyclerView.ViewHolder> MutableList<ContentDescriptionProvider<Any>>.addCarousel(
+    priority: Int = 0,
     carouselView: ((parent: ViewGroup) -> View)? = null,
     carouselViewHolder: (parent: ViewGroup) -> HOLDER = {
         CarouselViewHolder<ITEM, ITEM_HOLDER>(
-            carouselView?.invoke(it) ?: throw Error("carouselView is required")
+            carouselView?.invoke(it) ?: throw Error("carouselView is required with default carouselViewHolder")
         ) as HOLDER
     },
     @IdRes carouselRecyclerViewId: Int = NO_ID,
-    items: List<ITEM>,
-    priority: Int = 0,
     carouselViewBinder: (holder: HOLDER) -> Unit = {},
-    itemViewHolderFactory: (parent: ViewGroup) -> ITEM_HOLDER,
+    items: List<ITEM>? = null,
+    itemData: LiveData<List<ITEM>> = object : LiveData<List<ITEM>>() {
+        override fun onActive() {
+            if (items == null) throw Error("items is required with default itemData")
+            postValue(items)
+        }
+    },
+    itemViewHolder: (parent: ViewGroup) -> ITEM_HOLDER,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM?) -> Unit = { _, _ -> }
 ) {
     add(descriptionProvider {
@@ -100,15 +106,11 @@ fun <HOLDER : CarouselViewHolder<ITEM, ITEM_HOLDER>, ITEM, ITEM_HOLDER : Recycle
                 carouselViewHolder(it).apply {
                     this.carouselViewBinder = carouselViewBinder as (Any) -> Unit
                     this.itemBinder = itemBinder
-                    this.itemViewHolderFactory = itemViewHolderFactory
+                    this.itemViewHolderFactory = itemViewHolder
                     this.carouselRecyclerViewId = carouselRecyclerViewId
                 }
             },
-            data = object : LiveData<List<ITEM>>() {
-                override fun onActive() {
-                    postValue(items)
-                }
-            },
+            data = itemData,
             priority = priority
         )
     } as ContentDescriptionProvider<Any>)

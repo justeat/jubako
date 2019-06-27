@@ -2,12 +2,14 @@ package com.sample.jubako
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
+import com.justeat.jubako.extensions.CarouselViewHolder
 import com.justeat.jubako.extensions.addCarousel
 import com.justeat.jubako.extensions.loadAsync
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
@@ -32,16 +34,41 @@ class LoadAsyncActivity : AppCompatActivity() {
             for (i in 0..100) {
                 compartments.forEach { compartment ->
                     addCarousel(
-                        layout = { layoutInflater.inflate(R.layout.simple_carousel_with_heading, it, false) },
-                        carouselRecyclerViewId = R.id.jubakoCarousel,
                         priority = compartment.priority + i,
-                        layoutBinder = { layout ->
-                            layout.itemView.findViewById<TextView>(R.id.heading).apply {
-                                text = compartment.title
-                            }
+                        //
+                        // You can specify a custom holder like this, or instead
+                        // provide the carouselView parameter instead to just
+                        // use the base CarouselViewHolder with an inflated view
+                        // (hint: custom view holders are better for strongly typed binding
+                        //  with the carouselViewBinder parameter)
+                        //
+                        carouselViewHolder = {
+                            CustomCarouselHolder(
+                                layoutInflater.inflate(R.layout.simple_carousel_with_heading, it, false)
+                            )
                         },
+                        //
+                        // The id of the recycler view in the holder
+                        // (with no id it will expect itemView itself is the recycler!)
+                        //
+                        carouselRecyclerViewId = R.id.jubakoCarousel,
+                        //
+                        // Perform any binding on the carousel view itself
+                        //
+                        carouselViewBinder = { holder ->
+                            holder.heading.text = compartment.title
+                        },
+                        //
+                        // The items (data) that will  bound to the carousel
+                        //
                         items = compartment.items,
+                        //
+                        // A factory to produce item view holders
+                        //
                         itemViewHolderFactory = { SimpleCarouselItemViewHolder(it) },
+                        //
+                        // Perform binding of the item data to the holder
+                        //
                         itemBinder = { holder, data -> holder.bind(data) })
                 }
             }
@@ -86,5 +113,11 @@ class LoadAsyncActivity : AppCompatActivity() {
                 )
             )
         }
+    }
+
+    class CustomCarouselHolder(
+        itemView: View
+    ) : CarouselViewHolder<String, SimpleCarouselItemViewHolder>(itemView) {
+        val heading: TextView = itemView.findViewById(R.id.heading)
     }
 }

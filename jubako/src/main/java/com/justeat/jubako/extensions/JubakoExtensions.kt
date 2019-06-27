@@ -80,25 +80,29 @@ fun MutableList<ContentDescriptionProvider<Any>>.addView(delegate: () -> View) {
     })
 }
 
-fun <ITEM, ITEM_HOLDER : RecyclerView.ViewHolder> MutableList<ContentDescriptionProvider<Any>>.addCarousel(
-    layout: (parent: ViewGroup) -> View,
+fun <HOLDER : CarouselViewHolder<ITEM, ITEM_HOLDER>, ITEM, ITEM_HOLDER : RecyclerView.ViewHolder> MutableList<ContentDescriptionProvider<Any>>.addCarousel(
+    carouselView: ((parent: ViewGroup) -> View)? = null,
+    carouselViewHolder: (parent: ViewGroup) -> HOLDER = {
+        CarouselViewHolder<ITEM, ITEM_HOLDER>(
+            carouselView?.invoke(it) ?: throw Error("carouselView is required")
+        ) as HOLDER
+    },
     @IdRes carouselRecyclerViewId: Int = NO_ID,
     items: List<ITEM>,
     priority: Int = 0,
-    layoutBinder: (CarouselViewHolder<ITEM, ITEM_HOLDER>) -> Unit = {},
+    carouselViewBinder: (holder: HOLDER) -> Unit = {},
     itemViewHolderFactory: (parent: ViewGroup) -> ITEM_HOLDER,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM?) -> Unit = { _, _ -> }
 ) {
     add(descriptionProvider {
         ContentDescription(
             viewHolderFactory = viewHolderFactory {
-                CarouselViewHolder(
-                    layout(it),
-                    carouselRecyclerViewId,
-                    layoutBinder,
-                    itemViewHolderFactory,
-                    itemBinder
-                )
+                carouselViewHolder(it).apply {
+                    this.carouselViewBinder = carouselViewBinder as (Any) -> Unit
+                    this.itemBinder = itemBinder
+                    this.itemViewHolderFactory = itemViewHolderFactory
+                    this.carouselRecyclerViewId = carouselRecyclerViewId
+                }
             },
             data = object : LiveData<List<ITEM>>() {
                 override fun onActive() {
@@ -110,13 +114,15 @@ fun <ITEM, ITEM_HOLDER : RecyclerView.ViewHolder> MutableList<ContentDescription
     } as ContentDescriptionProvider<Any>)
 }
 
-open class CarouselViewHolder<T, VH : RecyclerView.ViewHolder>(
-    itemView: View,
-    @IdRes val carouselRecyclerViewId: Int = NO_ID,
-    val layoutBinder: (CarouselViewHolder<T, VH>) -> Unit = {},
-    val itemViewHolderFactory: (parent: ViewGroup) -> VH,
-    val itemBinder: (holder: VH, data: T?) -> Unit = { _, _ -> }
-) : JubakoViewHolder<List<T>>(itemView) {
+open class CarouselViewHolder<ITEM, ITEM_HOLDER : RecyclerView.ViewHolder>(
+    itemView: View
+) : JubakoViewHolder<List<ITEM>>(itemView) {
+
+    @IdRes
+    var carouselRecyclerViewId: Int = NO_ID
+    lateinit var itemViewHolderFactory: (parent: ViewGroup) -> ITEM_HOLDER
+    var carouselViewBinder: (Any) -> Unit = {}
+    var itemBinder: (holder: ITEM_HOLDER, data: ITEM?) -> Unit = { _, _ -> }
 
     private val recycler: JubakoCarouselRecyclerView by lazy {
         when (carouselRecyclerViewId) {
@@ -125,17 +131,17 @@ open class CarouselViewHolder<T, VH : RecyclerView.ViewHolder>(
         }
     }
 
-    override fun bind(data: List<T>?) {
-        layoutBinder(this)
+    override fun bind(data: List<ITEM>?) {
+        carouselViewBinder(this)
         recycler.adapter =
             createAdapter(data ?: emptyList())
     }
 
-    private fun createAdapter(data: List<T>): RecyclerView.Adapter<VH> {
-        return object : RecyclerView.Adapter<VH>() {
+    private fun createAdapter(data: List<ITEM>): RecyclerView.Adapter<ITEM_HOLDER> {
+        return object : RecyclerView.Adapter<ITEM_HOLDER>() {
             override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = itemViewHolderFactory(parent)
             override fun getItemCount(): Int = data.size
-            override fun onBindViewHolder(holder: VH, position: Int) {
+            override fun onBindViewHolder(holder: ITEM_HOLDER, position: Int) {
                 itemBinder(holder, data[position])
             }
         }

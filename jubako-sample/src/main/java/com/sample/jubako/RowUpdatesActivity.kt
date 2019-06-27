@@ -18,6 +18,8 @@ import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 
 class RowUpdatesActivity : AppCompatActivity() {
 
+    private lateinit var updater: RowUpdaterHandler
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_jubako_recycler)
@@ -48,23 +50,34 @@ class RowUpdatesActivity : AppCompatActivity() {
             }
         }
 
-        RowUpdaterHandler(jubakoRecycler).postUpdates()
+        updater = RowUpdaterHandler(jubakoRecycler).apply {
+            postUpdates()
+        }
     }
 
     class RowUpdaterHandler(private val recycler: RecyclerView) : Handler() {
+        private var running: Boolean = false
         var currentRow = 0
 
         fun postUpdates() {
-            sendMessageDelayed(Message.obtain().apply { what = UPDATE }, 2)
+            running = true
+            sendMessageDelayed(Message.obtain().apply { what = UPDATE }, 24)
+        }
+
+        fun stop() {
+            running = false
+            removeMessages(UPDATE)
         }
 
         override fun handleMessage(msg: Message) {
-            if (msg.what == UPDATE) {
-                (recycler.adapter as? JubakoAdapter)?.reload(HELLO_ID + currentRow++)
-                if (currentRow == ROWS) {
-                    currentRow = 0
+            if (running) {
+                if (msg.what == UPDATE) {
+                    (recycler.adapter as? JubakoAdapter)?.reload(HELLO_ID + currentRow++)
+                    if (currentRow == ROWS) {
+                        currentRow = 0
+                    }
+                    postUpdates()
                 }
-                postUpdates()
             }
         }
     }
@@ -74,6 +87,11 @@ class RowUpdatesActivity : AppCompatActivity() {
             setText(text)
             setTextSize(TypedValue.COMPLEX_UNIT_DIP, 48f)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        updater.stop()
     }
 }
 

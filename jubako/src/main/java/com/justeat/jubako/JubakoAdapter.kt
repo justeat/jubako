@@ -175,7 +175,9 @@ open class JubakoAdapter(
 
         scrollListener = object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                if (!recyclerView.canScrollVertically(SCROLL_DIRECTION_DOWN)) {
+                val offset = recyclerView.computeVerticalScrollOffset()
+                val range = recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent()
+                if (range != 0 && offset > range * 0.8f) {
                     logger.log("Scroll Trigger Load")
                     data.apply {
                         loadingStrategy.load(
@@ -187,6 +189,7 @@ open class JubakoAdapter(
                             false
                         }
                     }
+                    //      }
                 }
             }
         }
@@ -200,6 +203,7 @@ open class JubakoAdapter(
         item?.reset?.apply {
             invoke(item, payload)
             if (data.loaded(item)) {
+                logger.log("Reload", "description: $contentDescriptionId, position: $position")
                 loadingStrategy.reload(lifecycleOwner, position, data.loadedContentDescriptions)
             }
         }

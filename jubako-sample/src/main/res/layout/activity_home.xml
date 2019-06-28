@@ -25,7 +25,12 @@
             android:layout_height="wrap_content"/>
     <Button android:id="@+id/sampleSelfUpdatingItems"
             android:layout_marginTop="16dp"
-            android:text="@string/button_self_updating_items"
+            android:text="@string/button_sample_self_updating_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+    <Button android:id="@+id/sampleEnterpriseHello"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sample_enterprise_hello"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 </LinearLayout>

@@ -30,6 +30,10 @@ class HomeActivity : AppCompatActivity() {
         sampleSelfUpdatingItems.setOnClickListener {
             startActivity(Intent(this, SelfUpdatingItemsActivity::class.java))
         }
+
+        sampleEnterpriseHello.setOnClickListener {
+            startActivity(Intent(this, EnterpriseHelloJubakoActivity::class.java))
+        }
     }
 }
 

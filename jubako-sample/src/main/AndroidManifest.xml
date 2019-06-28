@@ -21,5 +21,6 @@
         <activity android:name=".LoadAsyncActivity"/>
         <activity android:name=".RowUpdatesActivity"/>
         <activity android:name=".SelfUpdatingItemsActivity"/>
+        <activity android:name=".EnterpriseHelloJubakoActivity"/>
     </application>
 </manifest>

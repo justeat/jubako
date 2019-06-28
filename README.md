@@ -23,16 +23,18 @@ class HelloJubakoActivity : AppCompatActivity() {
 
         Jubako.logger.enabled = true
 
-        Jubako.into(this, jubakoRecycler).load {
+        jubakoRecycler.withJubako(this).load {
             for (i in 0..100) {
-                withView { textView("Hello Jubako!") }
-                withView { textView("こんにちはジュバコ") }
+                addView { textView("Hello Jubako!") }
+                addView { textView("こんにちはジュバコ") }
             }
         }
     }
 
     private fun textView(text: String): TextView {
-        return TextView(this).apply { setText(text) }
+        return TextView(this).apply {
+            setText(text)
+        }
     }
 }
 ```
@@ -40,9 +42,9 @@ class HelloJubakoActivity : AppCompatActivity() {
 In this simple example we use some of Jubako's convenience extensions to compose a `RecyclerView` with
 100 rows.
 
-We use first function `Jubako.into`  to specify which recycler to load into, and a call to `load` and using
-Jubako's `withView` extension function to specify a row in our recycler that conveniently constructs
-the necessary boilerplate under the hood (with full fall-through functionality).
+Firstly the extension function `RecyclerView.withJubako` to specify which recycler, context and other options to load into following up with
+ a call to `load`. Then, using Jubako's `withView` extension function we can specify the view for a row in our recycler that conveniently constructs
+the necessary boilerplate under the hood.
 
 Mostly this approach might work for simple applications, but under the hood Jubako offers more verbose
 construction to support more complicated scenarios.

@@ -121,49 +121,6 @@ open class Jubako : ViewModel(), CoroutineScope {
             viewModel.loadingState.observe(activity, Observer { changed(it) })
             return viewModel
         }
-
-        fun into(
-            activity: FragmentActivity,
-            recycler: JubakoRecyclerView,
-            onAssembled: (data: Data) -> Unit = {},
-            onAssembling: () -> Unit = {},
-            onAssembleError: () -> Unit = {}
-        ): Jubako {
-            return observe(activity) { state ->
-                when (state) {
-                    is State.Assembled -> {
-                        onAssembled(state.data)
-                        recycler.adapter = JubakoAdapter(activity, state.data)
-                    }
-                    is State.Assembling -> onAssembling()
-                    is State.AssembleError -> onAssembleError()
-                }
-            }
-        }
-
-        fun into(
-            activity: FragmentActivity,
-            recycler: JubakoRecyclerView,
-            loadingStrategy: ContentLoadingStrategy,
-            onAssembled: (data: Data) -> Unit = {},
-            onAssembling: () -> Unit = {},
-            onAssembleError: () -> Unit = {}
-        ): Jubako {
-            return observe(recycler.context as FragmentActivity) { state ->
-                when (state) {
-                    is State.Assembled -> {
-                        onAssembled(state.data)
-                        recycler.adapter = JubakoAdapter(
-                            lifecycleOwner = activity,
-                            data = state.data,
-                            loadingStrategy = loadingStrategy
-                        )
-                    }
-                    is State.Assembling -> onAssembling()
-                    is State.AssembleError -> onAssembleError()
-                }
-            }
-        }
     }
 
     open class Logger(var enabled: Boolean) {

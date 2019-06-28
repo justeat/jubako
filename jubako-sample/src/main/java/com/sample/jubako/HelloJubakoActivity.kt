@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.extensions.addView
 import com.justeat.jubako.extensions.load
+import com.justeat.jubako.extensions.withJubako
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 
 class HelloJubakoActivity : AppCompatActivity() {
@@ -17,7 +18,7 @@ class HelloJubakoActivity : AppCompatActivity() {
 
         Jubako.logger.enabled = true
 
-        Jubako.into(this, jubakoRecycler).load {
+        jubakoRecycler.withJubako(this).load {
             for (i in 0..100) {
                 addView { textView("Hello Jubako!") }
                 addView { textView("こんにちはジュバコ") }

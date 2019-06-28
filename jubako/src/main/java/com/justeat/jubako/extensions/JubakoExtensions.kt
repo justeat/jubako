@@ -4,10 +4,12 @@ import android.view.View
 import android.view.View.NO_ID
 import android.view.ViewGroup
 import androidx.annotation.IdRes
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.*
 import com.justeat.jubako.widgets.JubakoCarouselRecyclerView
+import com.justeat.jubako.widgets.JubakoRecyclerView
 import java.util.*
 
 typealias ListReceiver = MutableList<ContentDescriptionProvider<Any>>.() -> Unit
@@ -33,6 +35,27 @@ fun assemble(descriptionProviders: ListReceiver): JubakoAssembler {
             mutableListOf<ContentDescriptionProvider<Any>>().apply {
                 descriptionProviders.invoke(this)
             }
+    }
+}
+
+fun RecyclerView.withJubako(
+    activity: FragmentActivity,
+    loadingStrategy: ContentLoadingStrategy = PaginatedContentLoadingStrategy(10),
+    onAssembled: (data: Jubako.Data) -> Unit = {},
+    onAssembling: () -> Unit = {},
+    onAssembleError: () -> Unit = {}
+): Jubako {
+    assert(this is JubakoRecyclerView)
+
+    return Jubako.observe(activity) { state ->
+        when (state) {
+            is Jubako.State.Assembled -> {
+                onAssembled(state.data)
+                adapter = JubakoAdapter(activity, state.data, loadingStrategy)
+            }
+            is Jubako.State.Assembling -> onAssembling()
+            is Jubako.State.AssembleError -> onAssembleError()
+        }
     }
 }
 

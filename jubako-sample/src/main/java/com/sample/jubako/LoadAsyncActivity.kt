@@ -12,6 +12,7 @@ import com.justeat.jubako.Jubako
 import com.justeat.jubako.extensions.CarouselViewHolder
 import com.justeat.jubako.extensions.addCarousel
 import com.justeat.jubako.extensions.loadAsync
+import com.justeat.jubako.extensions.withJubako
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 
 class LoadAsyncActivity : AppCompatActivity() {
@@ -22,9 +23,8 @@ class LoadAsyncActivity : AppCompatActivity() {
 
         Jubako.logger.enabled = true
 
-        Jubako.into(
+        jubakoRecycler.withJubako(
             activity = this,
-            recycler = jubakoRecycler,
             onAssembling = ::showLoading,
             onAssembled = { showContent() }).loadAsync {
 

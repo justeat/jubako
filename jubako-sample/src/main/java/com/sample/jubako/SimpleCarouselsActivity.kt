@@ -11,6 +11,7 @@ import com.justeat.jubako.Jubako
 import com.justeat.jubako.extensions.addCarousel
 import com.justeat.jubako.extensions.load
 import com.justeat.jubako.extensions.pageSize
+import com.justeat.jubako.extensions.withJubako
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -26,7 +27,7 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         Jubako.logger = Jubako.Logger(BuildConfig.DEBUG)
 
         // Set page size to 1 so we can see it loading (descriptions are delayed by 500ms)
-        Jubako.into(this, jubakoRecycler, pageSize(1)).load {
+        jubakoRecycler.withJubako(this, pageSize(1)).load {
             (0 until 100).forEach { i ->
                 addCarousel(
                     priority = i,

@@ -22,11 +22,11 @@ data class ContentDescription<T>(
      * Will be called before a reload via [JubakoAdapter.reload] with an optional payload.
      *
      * A reload will cause [data] to be observed again effectively reloading this descriptions
-     * corresponding data in the recycler, by assigning a function to [reset] gives the opportunity
+     * corresponding data in the recycler, by assigning a function to [onReload] gives the opportunity
      * to reassign [data]. Optionally a payload can passed to [JubakoAdapter.reload] or
      * [JubakoViewHolder.reload] that can be evaluated when reassigning [data].
      */
-    val reset: ((self: ContentDescription<T>, payload: Any?) -> Unit) = { _, _ -> },
+    val onReload: (ContentDescription<T>.(payload: Any?) -> Unit) = {},
 
     /**
      * Set the importance of this content where lower numbers have higher importance, useful

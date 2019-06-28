@@ -18,7 +18,7 @@ class TestContentDescriptionProvider(
                     postValue(data)
                 }
             },
-            reset = { a, _ ->
+            onReload = { a, _ ->
                 a.data = object : LiveData<String>() {
                     override fun onActive() {
                         postValue("Peek-a-Boo!")

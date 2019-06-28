@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProviders
-import com.justeat.jubako.widgets.JubakoRecyclerView
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -58,7 +57,7 @@ open class Jubako : ViewModel(), CoroutineScope {
      */
     open fun load(contentAssembler: JubakoAssembler) {
         //
-        // Only set assembler once (unless reset)
+        // Only set assembler once (unless onReload)
         //
         if (data != null || loadingJob != null) return
 
@@ -124,7 +123,7 @@ open class Jubako : ViewModel(), CoroutineScope {
     }
 
     open class Logger(var enabled: Boolean) {
-        private val tag = Jubako::class.java.simpleName!!
+        open val tag = Jubako::class.java.simpleName!!
 
         open fun log(state: String, message: String = "") {
             if (enabled) log(tag, state, message)

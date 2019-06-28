@@ -178,7 +178,7 @@ fun pageSize(pageSize: Int) = PaginatedContentLoadingStrategy(pageSize)
 fun <T> MutableList<ContentDescriptionProvider<Any>>.addDescription(
     viewHolderFactory: JubakoAdapter.HolderFactory<T>,
     data: LiveData<T>? = null,
-    onReload: (ContentDescription<T>.(payload: Any?) -> Unit) = { _ -> },
+    onReload: (ContentDescription<T>.(payload: Any?) -> Unit) = { },
     priority: Int = 0,
     id: String = UUID.randomUUID().toString()
 ) {
@@ -186,7 +186,7 @@ fun <T> MutableList<ContentDescriptionProvider<Any>>.addDescription(
         ContentDescription(
             viewHolderFactory = viewHolderFactory,
             data = data,
-            reset = onReload,
+            onReload = onReload,
             priority = priority,
             id = id
         )

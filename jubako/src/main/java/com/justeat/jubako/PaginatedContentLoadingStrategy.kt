@@ -31,7 +31,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         destination: ContentDescriptionCollection,
         onLoaded: (hasMore: Boolean) -> Boolean
     ) {
-        logger.log(TAG, "Load", "reset: $reset, loading observers: ${loadingData.size}")
+        logger.log(TAG, "Load", "onReload: $reset, loading observers: ${loadingData.size}")
         if(BuildConfig.DEBUG) {
             TEMP_integrityCheck(destination, source)
         }
@@ -63,7 +63,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         destination: ContentDescriptionCollection,
         onLoaded: (hasMore: Boolean) -> Boolean
     ) {
-        logger.log(TAG, "Load Descriptions", "reset: $reset")
+        logger.log(TAG, "Load Descriptions", "onReload: $reset")
         if (destination.size() == source.size) {
             logger.log(TAG, "Stop Loading", "dest size: ${destination.size()}, source size: ${source.size}")
             onLoaded(false)
@@ -92,7 +92,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         destination: ContentDescriptionCollection,
         onLoaded: (hasMore: Boolean) -> Boolean
     ) {
-        logger.log(TAG, "Proceed", "reset: $reset")
+        logger.log(TAG, "Proceed", "onReload: $reset")
         if (!reset) {
             pagedDescriptions.add(currentDescription!!)
             logger.log(

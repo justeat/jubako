@@ -4,10 +4,10 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.github.justeat'
+version = "0.22"
 
 android {
     compileSdkVersion 28
-
 
     defaultConfig {
         minSdkVersion 21

@@ -146,7 +146,7 @@ open class JubakoAdapter(
     private fun attachReloader(item: ContentDescription<Any>, holder: JubakoViewHolder<Any>) {
         holder.reloader = { position, payload ->
             handler.post {
-                item.reset.apply {
+                item.onReload.apply {
                     invoke(item, payload)
                     data.apply {
                         if (loadedContentDescriptions.contains(item)) {
@@ -200,7 +200,7 @@ open class JubakoAdapter(
     fun reload(contentDescriptionId: String, payload: Any? = null) {
         val item = data.byContentDescriptionId(contentDescriptionId)
         val position: Int = data.indexOf(item)
-        item?.reset?.apply {
+        item?.onReload?.apply {
             invoke(item, payload)
             if (data.loaded(item)) {
                 logger.log("Reload", "description: $contentDescriptionId, position: $position")

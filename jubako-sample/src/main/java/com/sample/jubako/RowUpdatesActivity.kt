@@ -27,7 +27,7 @@ class RowUpdatesActivity : AppCompatActivity() {
 
         Jubako.logger.enabled = true
 
-        jubakoRecycler.withJubako(this).load {
+        recyclerView.withJubako(this).load {
             for (i in 0 until ROWS) {
                 var hello = "Hello Jubako! $i "
                 addDescription(
@@ -51,7 +51,7 @@ class RowUpdatesActivity : AppCompatActivity() {
             }
         }
 
-        updater = RowUpdaterHandler(jubakoRecycler).apply {
+        updater = RowUpdaterHandler(recyclerView).apply {
             postUpdates()
         }
     }

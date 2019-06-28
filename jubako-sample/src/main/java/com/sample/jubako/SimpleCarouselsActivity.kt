@@ -27,7 +27,7 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         Jubako.logger = Jubako.Logger(BuildConfig.DEBUG)
 
         // Set page size to 1 so we can see it loading (descriptions are delayed by 500ms)
-        jubakoRecycler.withJubako(this, pageSize(1)).load {
+        recyclerView.withJubako(this, pageSize(1)).load {
             (0 until 100).forEach { i ->
                 addCarousel(
                     priority = i,

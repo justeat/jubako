@@ -219,5 +219,3 @@ open class JubakoAdapter(
 
     var onViewHolderEvent: (event: Event) -> Unit = { }
 }
-
-private const val SCROLL_DIRECTION_DOWN = 1

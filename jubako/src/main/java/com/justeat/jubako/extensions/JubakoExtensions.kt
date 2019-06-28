@@ -139,9 +139,8 @@ fun <HOLDER : CarouselViewHolder<ITEM, ITEM_HOLDER>, ITEM, ITEM_HOLDER : Recycle
     } as ContentDescriptionProvider<Any>)
 }
 
-open class CarouselViewHolder<ITEM, ITEM_HOLDER : RecyclerView.ViewHolder>(
-    itemView: View
-) : JubakoViewHolder<List<ITEM>>(itemView) {
+open class CarouselViewHolder<ITEM, ITEM_HOLDER : RecyclerView.ViewHolder>(itemView: View) :
+    JubakoViewHolder<List<ITEM>>(itemView) {
 
     @IdRes
     var carouselRecyclerViewId: Int = NO_ID

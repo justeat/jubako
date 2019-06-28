@@ -23,7 +23,7 @@ class LoadAsyncActivity : AppCompatActivity() {
 
         Jubako.logger.enabled = true
 
-        jubakoRecycler.withJubako(
+        recyclerView.withJubako(
             activity = this,
             onAssembling = ::showLoading,
             onAssembled = { showContent() }).loadAsync {
@@ -77,12 +77,12 @@ class LoadAsyncActivity : AppCompatActivity() {
 
     private fun showContent() {
         loadingIndicator.isGone = true
-        jubakoRecycler.isGone = false
+        recyclerView.isGone = false
     }
 
     private fun showLoading() {
         loadingIndicator.isGone = false
-        jubakoRecycler.isGone = true
+        recyclerView.isGone = true
     }
 
     inner class SimpleCarouselItemViewHolder(parent: ViewGroup) :

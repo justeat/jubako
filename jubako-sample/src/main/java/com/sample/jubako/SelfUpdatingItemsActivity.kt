@@ -22,7 +22,7 @@ class SelfUpdatingItemsActivity : AppCompatActivity() {
 
         Jubako.logger.enabled = true
 
-        jubakoRecycler.withJubako(this).load {
+        recyclerView.withJubako(this).load {
             for (i in 0..100) {
                 var counter = 0
                 addDescription(

@@ -21,9 +21,7 @@ class HelloJubakoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_jubako_recycler)
 
-        Jubako.logger.enabled = true
-
-        jubakoRecycler.withJubako(this).load {
+        recyclerView.withJubako(this).load {
             for (i in 0..100) {
                 addView { textView("Hello Jubako!") }
                 addView { textView("こんにちはジュバコ") }

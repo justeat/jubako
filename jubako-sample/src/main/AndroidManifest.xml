@@ -20,5 +20,6 @@
         <activity android:name=".SimpleCarouselsActivity"/>
         <activity android:name=".LoadAsyncActivity"/>
         <activity android:name=".RowUpdatesActivity"/>
+        <activity android:name=".SelfUpdatingItemsActivity"/>
     </application>
 </manifest>

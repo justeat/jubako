@@ -37,7 +37,7 @@ class RowUpdatesActivity : AppCompatActivity() {
                             postValue(hello)
                         }
                     },
-                    onReload = { _, _ ->
+                    onReload = {
                         hello = hello.plus(hello.first()).drop(1)
                     },
                     viewHolderFactory = viewHolderFactory {

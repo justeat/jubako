@@ -26,6 +26,10 @@ class HomeActivity : AppCompatActivity() {
         sampleRowUpdates.setOnClickListener {
             startActivity(Intent(this, RowUpdatesActivity::class.java))
         }
+
+        sampleSelfUpdatingItems.setOnClickListener {
+            startActivity(Intent(this, SelfUpdatingItemsActivity::class.java))
+        }
     }
 }
 

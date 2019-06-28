@@ -23,4 +23,9 @@
             android:text="@string/button_sample_row_updates"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
+    <Button android:id="@+id/sampleSelfUpdatingItems"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_self_updating_items"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 </LinearLayout>

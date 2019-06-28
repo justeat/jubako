@@ -4,4 +4,5 @@
     <string name="button_sample_simple_carousels">Simple Carousels</string>
     <string name="button_sample_load_async">Load Async</string>
     <string name="button_sample_row_updates">Row Updates</string>
+    <string name="button_self_updating_items">Self Updating Items</string>
 </resources>

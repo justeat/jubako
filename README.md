@@ -2,16 +2,11 @@
 
 [![](https://jitpack.io/v/justeat/jubako.svg)](https://jitpack.io/#justeat/jubako)
 
-Jubako is a small API that aims to make it easy to assemble rich asynchronous content into a `RecyclerView` such as a wall of carousels (Google Play style recycler in recyclers).
+Jubako aims to make it easy to assemble rich asynchronous content into a `RecyclerView` 
+such as a wall of carousels (Google Play style recycler in recyclers).
 
-Jubako can load content up front (via an assembly phase)  or load on the fly (where recycler rows can be paginated into
-        view and dependent data loaded lazily per row).
-
-With Jubako a `ContentDescription<T>` is used to define a piece of asynchronous content. `ContentDescription<T>` that
-optionally requires the developer to implement a property `data: LiveData<T>?` that will represent the data to load.
-
-Out of the box, Jubako provides a `PaginatedContentLoadingStrategy` that fills the screen with loaded content descriptions
-in a paginated manner.
+Jubako can load content up front (via an **assembly** phase)  or load on the fly 
+(where recycler rows can be paginated into view and dependent data loaded asynchronously per row).
 
 ## The simplest example - "Hello Jubako!"
 ```kotlin
@@ -40,12 +35,16 @@ class HelloJubakoActivity : AppCompatActivity() {
 In this simple example we use some of Jubako's convenience extensions to compose a `RecyclerView` with
 100 rows.
 
-Firstly the extension function `RecyclerView.withJubako` to specify which recycler, context and other options to load into following up with
- a call to `load`. Then, using Jubako's `withView` extension function we can specify the view for a row in our recycler that conveniently constructs
-the necessary boilerplate under the hood.
+Firstly the extension function `RecyclerView.withJubako` expresses which RecyclerView we want to load into
+(passing context) and then we follow up with a call to `load` describing what we want to load inside its lambda argument.
+  
+We can then make calls to Jubako's `withView` extension function to specify each view (just a regular `android.view.View`)  we wish
+to display for a row in our recycler that conveniently constructs the necessary boilerplate under the hood.
 
-Mostly this approach might work for simple applications, but under the hood Jubako offers more verbose
-construction to support more complicated scenarios.
+** Mostly this approach might work for simple applications, but under the hood Jubako offers more verbose
+construction to support more complicated scenarios.** 
+
+The best place to start right now with Jubako is to check it the examples in the `jubako-sample` app in this repository.
 
 ## JubakoAssembler
 In order to load content into Jubako we must construct a `JubakoAssembler`. An assembler (similar to an adapter) is used to compose

@@ -47,13 +47,14 @@ construction to support more complicated scenarios.**
 The best place to start right now with Jubako is to check it the examples in the `jubako-sample` app in this repository.
 
 ## JubakoAssembler
-In order to load content into Jubako we must construct a `JubakoAssembler`. An assembler (similar to an adapter) is used to compose
-a *list of descriptions* that we wish to render (carousels, cards, etc). Its basic interface has a single function `::assemble()` that 
-will be called by Jubako when its time to assemble the list of descriptions.
+Without the added convenience of Jubako `load` we can also load content with a derived implementation of `JubakoAssembler`. 
+
+An assembler (similar to an adapter) is used to compose a *list of descriptions* that we wish to render (carousels, cards, etc). 
+Its basic interface has a single function `::assemble()` that will be called by Jubako when it is time to assemble this list.
 
 Content is added with the assembler by creating and adding instances of `ContentDescriptionProvider`, and the purpose of a provider
 is to construct an instance of `ContentDescription` where a content description defines which view holder to use and the data that
-will be bound to the view holder where the data is `LiveData<T>`.
+will be bound to the view holder where that data is a `LiveData<T>`.
 
 The simplest usage of `JubakoAssembler` is using its derived type `SimpleJubakoAssembler` that adds convenience to
 assembling simple lists of content, for example:-
@@ -79,7 +80,7 @@ before it goes into the *Assembled* state. You can respond to these state change
 Jubako.observe(this) { state ->
     when (state) {
         is Jubako.State.Assembled -> {
-            bindAdapter(state.data)
+            recyclerView.adapter = JubakoAdapter(state.data)
         }
         is Jubako.State.Assembling -> {
             // TODO show a loading indicator

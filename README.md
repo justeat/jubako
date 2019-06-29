@@ -41,7 +41,7 @@ Firstly the extension function `RecyclerView.withJubako` expresses which Recycle
 We can then make calls to Jubako's `withView` extension function to specify each view (just a regular `android.view.View`)  we wish
 to display for a row in our recycler that conveniently constructs the necessary boilerplate under the hood.
 
-** Mostly this approach might work for simple applications, but under the hood Jubako offers more verbose
+**Mostly this approach might work for simple applications, but under the hood Jubako offers more verbose
 construction to support more complicated scenarios.** 
 
 The best place to start right now with Jubako is to check it the examples in the `jubako-sample` app in this repository.

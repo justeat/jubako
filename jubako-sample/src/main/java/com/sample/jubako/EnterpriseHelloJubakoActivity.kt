@@ -150,6 +150,6 @@ class EnterpriseHelloJubakoActivity : AppCompatActivity() {
 // Simulate for some random delay
 //
 private const val MAX_DELAY_MS = 300L
-private const val FAILURE_THRESHOLD_MS = 250L
+private const val FAILURE_THRESHOLD_MS = 150L
 private val random = Random(System.currentTimeMillis())
 val randomTime: () -> Long = { random.nextLong(MAX_DELAY_MS) }

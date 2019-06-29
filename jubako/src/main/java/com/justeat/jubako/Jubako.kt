@@ -71,7 +71,7 @@ open class Jubako : ViewModel(), CoroutineScope {
                         completeAssemble(contentAssembler.assemble())
                     )
                 )
-            } catch (exception: Exception) {
+            } catch (exception: Throwable) {
                 logger.log("Assemble Error", "${Log.getStackTraceString(exception)}")
                 loadingState.postValue(State.AssembleError(exception))
             } finally {

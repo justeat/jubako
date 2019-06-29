@@ -34,6 +34,10 @@ class HomeActivity : AppCompatActivity() {
         sampleEnterpriseHello.setOnClickListener {
             startActivity(Intent(this, EnterpriseHelloJubakoActivity::class.java))
         }
+
+        sampleMovies.setOnClickListener {
+            startActivity(Intent(this, MoviesActivity::class.java))
+        }
     }
 }
 

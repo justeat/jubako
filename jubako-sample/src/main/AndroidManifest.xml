@@ -1,26 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools" package="com.sample.jubako">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.sample.jubako">
 
     <application
-            android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
-            android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
-            android:theme="@style/AppTheme"
-            tools:ignore="GoogleAppIndexingWarning">
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:theme="@style/AppTheme"
+        tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".HomeActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".HelloJubakoActivity"/>
-        <activity android:name=".SimpleCarouselsActivity"/>
-        <activity android:name=".LoadAsyncActivity"/>
-        <activity android:name=".RowUpdatesActivity"/>
-        <activity android:name=".SelfUpdatingItemsActivity"/>
-        <activity android:name=".EnterpriseHelloJubakoActivity"/>
+        <activity
+            android:name=".HelloJubakoActivity"
+            android:label="Hello" />
+        <activity
+            android:name=".SimpleCarouselsActivity"
+            android:label="Simple Carousels" />
+        <activity
+            android:name=".LoadAsyncActivity"
+            android:label="Load Async" />
+        <activity
+            android:name=".RowUpdatesActivity"
+            android:label="Row Updates" />
+        <activity
+            android:name=".SelfUpdatingItemsActivity"
+            android:label="Self Updating Items" />
+        <activity
+            android:name=".EnterpriseHelloJubakoActivity"
+            android:label="Enterprise Hello" />
+        <activity
+            android:name=".MoviesActivity"
+            android:label="Jubako TV" />
     </application>
 </manifest>

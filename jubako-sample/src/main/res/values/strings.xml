@@ -7,5 +7,5 @@
     <string name="button_sample_self_updating_items">Self Updating Items</string>
     <string name="button_sample_enterprise_hello">Enterprise Hello</string>
     <string name="retry_button">Try Again</string>
-    <string name="error_message">Something wont wrong!</string>
+    <string name="error_message">Something went wrong!</string>
 </resources>

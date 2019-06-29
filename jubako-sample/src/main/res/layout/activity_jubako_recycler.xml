@@ -22,14 +22,13 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scrollbars="vertical"
-        android:visibility="gone" />
+        android:scrollbars="vertical" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/error"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible">
+        android:visibility="gone">
 
         <TextView
             style="@style/TextAppearance.AppCompat.Large"

@@ -16,10 +16,10 @@ open class JubakoRecyclerView @JvmOverloads constructor(
     private var scrollPointerId = -1
     private var pointTouchX = 0
     private var pointTouchY = 0
-    private var touchSlopType = 0
+    private var touchSlop = 0
 
     init {
-        touchSlopType = ViewConfiguration.get(context).scaledTouchSlop
+        touchSlop = ViewConfiguration.get(context).scaledTouchSlop
         layoutManager = LinearLayoutManager(context)
     }
 
@@ -28,8 +28,8 @@ open class JubakoRecyclerView @JvmOverloads constructor(
 
         val viewConfiguration = ViewConfiguration.get(context)
         when (slopConstant) {
-            TOUCH_SLOP_DEFAULT -> touchSlopType = viewConfiguration.scaledTouchSlop
-            TOUCH_SLOP_PAGING -> touchSlopType = viewConfiguration.scaledPagingTouchSlop
+            TOUCH_SLOP_DEFAULT -> touchSlop = viewConfiguration.scaledTouchSlop
+            TOUCH_SLOP_PAGING -> touchSlop = viewConfiguration.scaledPagingTouchSlop
         }
     }
 
@@ -40,19 +40,20 @@ open class JubakoRecyclerView @JvmOverloads constructor(
 
         val action = event.actionMasked
         val actionIndex = event.actionIndex
+        val scale = 0.5f
 
         when (action) {
             MotionEvent.ACTION_DOWN -> {
                 scrollPointerId = event.getPointerId(0)
-                pointTouchX = Math.round(event.x + 0.5f)
-                pointTouchY = Math.round(event.y + 0.5f)
+                pointTouchX = Math.round(event.x + scale)
+                pointTouchY = Math.round(event.y + scale)
                 return super.onInterceptTouchEvent(event)
             }
 
             MotionEvent.ACTION_POINTER_DOWN -> {
                 scrollPointerId = event.getPointerId(actionIndex)
-                pointTouchX = Math.round(event.getX(actionIndex) + 0.5f)
-                pointTouchY = Math.round(event.getY(actionIndex) + 0.5f)
+                pointTouchX = Math.round(event.getX(actionIndex) + scale)
+                pointTouchY = Math.round(event.getY(actionIndex) + scale)
                 return super.onInterceptTouchEvent(event)
             }
 
@@ -62,19 +63,19 @@ open class JubakoRecyclerView @JvmOverloads constructor(
                     return false
                 }
 
-                val x = Math.round(event.getX(index) + 0.5f)
-                val y = Math.round(event.getY(index) + 0.5f)
+                val x = Math.round(event.getX(index) + scale)
+                val y = Math.round(event.getY(index) + scale)
                 if (scrollState != SCROLL_STATE_DRAGGING) {
                     val dx = x - pointTouchX
                     val dy = y - pointTouchY
                     var startScroll = false
-                    if (layoutManager?.canScrollHorizontally() == true && Math.abs(dx) > touchSlopType && (layoutManager?.canScrollVertically() == true || Math.abs(
+                    if (layoutManager?.canScrollHorizontally() == true && Math.abs(dx) > touchSlop && (layoutManager?.canScrollVertically() == true || Math.abs(
                             dx
                         ) > Math.abs(dy))
                     ) {
                         startScroll = true
                     }
-                    if (layoutManager?.canScrollVertically() == true && Math.abs(dy) > touchSlopType && (layoutManager?.canScrollHorizontally() == true || Math.abs(
+                    if (layoutManager?.canScrollVertically() == true && Math.abs(dy) > touchSlop && (layoutManager?.canScrollHorizontally() == true || Math.abs(
                             dy
                         ) > Math.abs(dx))
                     ) {

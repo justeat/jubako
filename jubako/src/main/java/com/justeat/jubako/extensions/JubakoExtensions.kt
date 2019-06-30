@@ -104,7 +104,6 @@ fun MutableList<ContentDescriptionProvider<Any>>.addView(delegate: () -> View) {
 }
 
 fun <HOLDER : CarouselViewHolder<ITEM, ITEM_HOLDER>, ITEM, ITEM_HOLDER : RecyclerView.ViewHolder> MutableList<ContentDescriptionProvider<Any>>.addCarousel(
-    priority: Int = 0,
     carouselView: ((parent: ViewGroup) -> View)? = null,
     carouselViewHolder: (parent: ViewGroup) -> HOLDER = {
         CarouselViewHolder<ITEM, ITEM_HOLDER>(
@@ -133,8 +132,7 @@ fun <HOLDER : CarouselViewHolder<ITEM, ITEM_HOLDER>, ITEM, ITEM_HOLDER : Recycle
                     this.carouselRecyclerViewId = carouselRecyclerViewId
                 }
             },
-            data = itemData,
-            priority = priority
+            data = itemData
         )
     } as ContentDescriptionProvider<Any>)
 }
@@ -186,7 +184,6 @@ fun <T> MutableList<ContentDescriptionProvider<Any>>.addDescription(
             viewHolderFactory = viewHolderFactory,
             data = data,
             onReload = onReload,
-            priority = priority,
             id = id
         )
     })

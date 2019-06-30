@@ -30,7 +30,6 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         recyclerView.withJubako(this, pageSize(1)).load {
             (0 until 100).forEach { i ->
                 addCarousel(
-                    priority = i,
                     carouselView = {
                         LayoutInflater.from(this@SimpleCarouselsActivity).inflate(R.layout.simple_carousel, it, false)
                     },

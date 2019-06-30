@@ -90,9 +90,6 @@ open class Jubako : ViewModel(), CoroutineScope {
                 viewTypes.add(description.id)
             }
 
-            contentDescriptions.sortWith(
-                compareBy(ContentDescription<Any>::priority)
-            )
             data = this
         }
 

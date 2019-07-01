@@ -124,9 +124,6 @@ A factory class that will create a ViewHolder that you want to use when renderin
 The data that will be loaded where T can be any type, later on when rendering this data (when loaded) will be passed to your
 `ViewHolder`'s `bind(T)` that you can implement to render the loaded content.
 
-#### priority: Int (optional)
-Defines how important this content is, lower values will put the row higher, and higher values will put the row lower.
-
 ## JubakoAdapter
 Once you observe the state `Jubako.State.Assembled` you can go ahead and construct your `JubakoAdapter`, by default the adapter will use `PaginatedContentLoadingStrategy`.
 

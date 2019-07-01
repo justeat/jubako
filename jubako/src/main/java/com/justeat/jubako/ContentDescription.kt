@@ -29,12 +29,6 @@ data class ContentDescription<T>(
     val onReload: (ContentDescription<T>.(payload: Any?) -> Unit) = {},
 
     /**
-     * Set the importance of this content where lower numbers have higher importance, useful
-     * for controlling position of content in rich recycler layouts
-     */
-    val priority: Int = 0,
-
-    /**
      * Automatically generated ID can be overridden with a specific ID which can be used
      * to reference content when one wishes to [JubakoAdapter.reload]
      */

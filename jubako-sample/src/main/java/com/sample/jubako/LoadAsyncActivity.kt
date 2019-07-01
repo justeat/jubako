@@ -34,7 +34,6 @@ class LoadAsyncActivity : AppCompatActivity() {
             for (i in 0..100) {
                 compartments.forEach { compartment ->
                     addCarousel(
-                        priority = compartment.priority + i,
                         //
                         // You can specify a custom holder like this, or instead
                         // provide the carouselView parameter instead to just

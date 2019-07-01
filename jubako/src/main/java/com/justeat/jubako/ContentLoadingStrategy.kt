@@ -8,8 +8,7 @@ interface ContentLoadingStrategy {
      */
     fun load(
         lifecycleOwner: LifecycleOwner,
-        source: MutableList<ContentDescription<Any>>,
-        destination: ContentDescriptionCollection,
+        data: Jubako.Data,
         onLoaded: (loadMore: Boolean) -> Boolean = { false }
     )
 

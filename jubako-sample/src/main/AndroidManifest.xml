@@ -38,5 +38,8 @@
         <activity
             android:name=".MoviesActivity"
             android:label="Jubako TV" />
+        <activity
+            android:name=".InfiniteHelloJubakoActivity"
+            android:label="Infinite Hello" />
     </application>
 </manifest>

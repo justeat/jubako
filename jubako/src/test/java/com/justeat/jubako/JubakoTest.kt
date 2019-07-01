@@ -55,7 +55,7 @@ class JubakoTest {
 
         (assembleCaptor.value as Jubako.State.Assembled).let {
             val data = it.data
-            assertEquals(MOCK_CONTENT_DESCRIPTION, data.contentDescriptions[0])
+            assertEquals(MOCK_CONTENT_DESCRIPTION, data.source[0])
             assertEquals(MOCK_HOLDER_FACTORY, data.viewHolderFactories[0])
             assertEquals(MOCK_CONTENT_DESCRIPTION_ID, data.viewTypes[0])
         }

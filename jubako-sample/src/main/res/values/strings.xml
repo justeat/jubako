@@ -9,4 +9,5 @@
     <string name="retry_button">Try Again</string>
     <string name="error_message">Something went wrong!</string>
     <string name="button_sample_movies">Movies</string>
+    <string name="button_infinite_hello">Infinite Hello</string>
 </resources>

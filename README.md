@@ -2,12 +2,9 @@
 
 [![](https://jitpack.io/v/justeat/jubako.svg)](https://jitpack.io/#justeat/jubako)
 
-Jubako makes things super simple to assemble rich content into 
-a `RecyclerView` such as a wall of carousels (Google Play style recycler in recyclers).
+<img align="left" src="https://github.com/justeat/jubako/blob/master/gfx/jubako_movies.png" />
+Jubako makes things super simple to assemble rich content into a `RecyclerView` such as a wall of carousels (Google Play style recycler in recyclers). Jubako can load content on the fly asynchronously, infinitely with pagination.
 
-![Alt text](gfx/jubako_movies.png?raw=true "Jubako Movies Example")
-
-Jubako can load content on the fly asynchronously, infinitely with pagination.
 
 ## The simplest example - "Hello Jubako! x 100"
 ```kotlin

@@ -5,7 +5,7 @@
 Jubako makes things super simple to assemble rich content into 
 a `RecyclerView` such as a wall of carousels (Google Play style recycler in recyclers).
 
-![Alt text](gfx/jubako_movies.png?raw=true "Jubako Movies Example")
+![Alt text](gfx/jubako_movies.png?raw=true "Jubako Movies Example" | width=256)
 
 Jubako can load content on the fly asynchronously, infinitely with pagination.
 

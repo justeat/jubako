@@ -38,6 +38,10 @@ class HomeActivity : AppCompatActivity() {
         sampleMovies.setOnClickListener {
             startActivity(Intent(this, MoviesActivity::class.java))
         }
+
+        sampleInfiniteHello.setOnClickListener {
+            startActivity(Intent(this, InfiniteHelloJubakoActivity::class.java))
+        }
     }
 }
 

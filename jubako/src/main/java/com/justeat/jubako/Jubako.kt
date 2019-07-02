@@ -3,10 +3,7 @@ package com.justeat.jubako
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.*
 import kotlinx.coroutines.*
 import kotlin.coroutines.CoroutineContext
 
@@ -22,24 +19,49 @@ open class Jubako : ViewModel(), CoroutineScope {
     internal var IO = Dispatchers.IO
 
     data class Data(
-        val contentDescriptions: MutableList<ContentDescription<Any>> = mutableListOf(),
-        val loadedContentDescriptions: ContentDescriptionCollection = ContentDescriptionCollection(),
+        private val scope: CoroutineScope,
+        private val assembler: JubakoAssembler,
+        val source: MutableList<ContentDescription<Any>> = mutableListOf(),
+        val destination: ContentDescriptionCollection = ContentDescriptionCollection(),
         val viewHolderFactories: MutableList<JubakoAdapter.HolderFactory<Any>> = mutableListOf(),
         val viewTypes: MutableList<String> = mutableListOf()
     ) {
+
+        @VisibleForTesting
+        internal var loadingJob: Job? = null
+
         fun getItemViewType(position: Int): Int =
-            viewTypes.indexOf(loadedContentDescriptions[position].id)
+            viewTypes.indexOf(destination[position].id)
 
         fun getItemId(position: Int): Long =
-            viewTypes.indexOf(loadedContentDescriptions[position].id).toLong()
+            viewTypes.indexOf(destination[position].id).toLong()
 
-        fun getItem(position: Int) = loadedContentDescriptions[position]
-        fun numItemsLoaded() = loadedContentDescriptions.size()
+        fun getItem(position: Int) = destination[position]
+        fun numItemsLoaded() = destination.size()
         fun byContentDescriptionId(contentDescriptionId: String): ContentDescription<Any>? =
-            contentDescriptions.find { it.id == contentDescriptionId }
+            source.find { it.id == contentDescriptionId }
 
-        fun indexOf(item: ContentDescription<Any>?): Int = contentDescriptions.indexOf(item)
-        fun loaded(item: ContentDescription<Any>): Boolean = loadedContentDescriptions.contains(item)
+        fun indexOf(item: ContentDescription<Any>?): Int = source.indexOf(item)
+        fun loaded(item: ContentDescription<Any>): Boolean = destination.contains(item)
+        fun hasMore() = assembler.hasMore() &&
+                (loadingJob == null || loadingJob!!.isCompleted)
+
+        fun assembleMore(): LiveData<State> {
+            val liveData = MutableLiveData<State>()
+
+            logger.log("Assembling More")
+            loadingJob = scope.launch(Dispatchers.IO) {
+                try {
+                    load(assembler)
+                    liveData.postValue(State.Assembled(this@Data))
+                } catch (exception: Throwable) {
+                    logger.log("Assemble Error", "${Log.getStackTraceString(exception)}")
+                    liveData.postValue(State.AssembleError(exception))
+                }
+            }
+
+            return liveData
+        }
     }
 
     private var data: Data? = null
@@ -68,7 +90,7 @@ open class Jubako : ViewModel(), CoroutineScope {
             try {
                 loadingState.postValue(
                     State.Assembled(
-                        completeAssemble(contentAssembler.assemble())
+                        completeAssemble(contentAssembler)
                     )
                 )
             } catch (exception: Throwable) {
@@ -80,16 +102,9 @@ open class Jubako : ViewModel(), CoroutineScope {
         }
     }
 
-    private fun completeAssemble(descriptionProviders: List<ContentDescriptionProvider<Any>>) =
-        Data().apply {
-            logger.log("Assembled", "${descriptionProviders.size} descriptions")
-            descriptionProviders.forEach {
-                val description = it.createDescription()
-                contentDescriptions.add(description)
-                viewHolderFactories.add(description.viewHolderFactory)
-                viewTypes.add(description.id)
-            }
-
+    private suspend fun completeAssemble(contentAssembler: JubakoAssembler) =
+        Data(this, contentAssembler).apply {
+            load(contentAssembler)
             data = this
         }
 
@@ -100,7 +115,7 @@ open class Jubako : ViewModel(), CoroutineScope {
         logger.log("Reset")
         loadingJob?.cancel()
         loadingJob = null
-        data?.loadedContentDescriptions?.clear()
+        data?.destination?.clear()
         data = null
     }
 
@@ -129,5 +144,16 @@ open class Jubako : ViewModel(), CoroutineScope {
         open fun log(tag: String, state: String, message: String = "") {
             if (enabled) Log.d(tag, "[$state] $message")
         }
+    }
+}
+
+private suspend fun Jubako.Data.load(contentAssembler: JubakoAssembler) {
+    val descriptionProviders = contentAssembler.assemble()
+    Jubako.logger.log("Assembled", "${descriptionProviders.size} more descriptions (total: ${source.size})")
+    descriptionProviders.forEach {
+        val description = it.createDescription()
+        source.add(description)
+        viewHolderFactories.add(description.viewHolderFactory)
+        viewTypes.add(description.id)
     }
 }

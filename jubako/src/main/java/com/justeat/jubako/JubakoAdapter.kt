@@ -25,7 +25,7 @@ open class JubakoAdapter(
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        logger.log("On Attach", "total rows: ${data.contentDescriptions.size}")
+        logger.log("On Attach", "total rows: ${data.source.size}")
         setupLoadMoreScrollTrigger(recyclerView)
         initialFillOnLayoutChanged(recyclerView)
         listenForContentChanges()
@@ -36,7 +36,7 @@ open class JubakoAdapter(
         // Listens for changes in ContentDescriptionCollection and relays
         // then to the adapter via the Adapter notify methods
         //
-        data.loadedContentDescriptions.listener =
+        data.destination.listener =
             ContentAdapterContentDescriptionCollectionListener(this)
     }
 
@@ -70,31 +70,25 @@ open class JubakoAdapter(
     private fun initialFill(recyclerView: RecyclerView) {
         var lastTimeVisibleItemPos = Int.MIN_VALUE
 
-        data.apply {
-            loadingStrategy.load(
-                lifecycleOwner,
-                contentDescriptions,
-                loadedContentDescriptions
-            )
+        loadingStrategy.load(lifecycleOwner, data)
 
-            { hasMore ->
-                val lastPos =
-                    (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
-                logger.log(
-                    "Initial Fill",
-                    "last visible item pos: $lastPos, previously: $lastTimeVisibleItemPos"
-                )
-                when {
-                    canLoadMoreDescriptions(hasMore, lastPos, lastTimeVisibleItemPos) -> {
-                        logger.log("Initial Fill", "filling screen...")
-                        lastTimeVisibleItemPos = lastPos
-                        true
-                    }
-                    else -> {
-                        logger.log("Initial Fill", "Complete")
-                        onInitialFill()
-                        false
-                    }
+        { hasMore ->
+            val lastPos =
+                (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
+            logger.log(
+                "Initial Fill",
+                "last visible item pos: $lastPos, previously: $lastTimeVisibleItemPos"
+            )
+            when {
+                canLoadMoreDescriptions(hasMore, lastPos, lastTimeVisibleItemPos) -> {
+                    logger.log("Initial Fill", "filling screen...")
+                    lastTimeVisibleItemPos = lastPos
+                    true
+                }
+                else -> {
+                    logger.log("Initial Fill", "Complete")
+                    onInitialFill()
+                    false
                 }
             }
         }
@@ -149,10 +143,10 @@ open class JubakoAdapter(
                 item.onReload.apply {
                     invoke(item, payload)
                     data.apply {
-                        if (loadedContentDescriptions.contains(item)) {
+                        if (destination.contains(item)) {
                             loadingStrategy.reload(
                                 lifecycleOwner,
-                                position, loadedContentDescriptions
+                                position, destination
                             )
                         }
                     }
@@ -179,17 +173,10 @@ open class JubakoAdapter(
                 val range = recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent()
                 if (range != 0 && offset > range * 0.8f) {
                     logger.log("Scroll Trigger Load")
-                    data.apply {
-                        loadingStrategy.load(
-                            lifecycleOwner,
-                            contentDescriptions,
-                            loadedContentDescriptions
-                        ) {
-                            logger.log("Scroll Trigger Load Complete")
-                            false
-                        }
+                    loadingStrategy.load(lifecycleOwner, data) {
+                        logger.log("Scroll Trigger Load Complete")
+                        false
                     }
-                    //      }
                 }
             }
         }
@@ -204,7 +191,7 @@ open class JubakoAdapter(
             invoke(item, payload)
             if (data.loaded(item)) {
                 logger.log("Reload", "description: $contentDescriptionId, position: $position")
-                loadingStrategy.reload(lifecycleOwner, position, data.loadedContentDescriptions)
+                loadingStrategy.reload(lifecycleOwner, position, data.destination)
             }
         }
     }

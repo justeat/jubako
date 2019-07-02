@@ -2,13 +2,12 @@
 
 [![](https://jitpack.io/v/justeat/jubako.svg)](https://jitpack.io/#justeat/jubako)
 
-Jubako aims to make it easy to assemble rich asynchronous content into a `RecyclerView` 
-such as a wall of carousels (Google Play style recycler in recyclers).
+Jubako makes things super simple to assemble rich content into 
+a `RecyclerView` such as a wall of carousels (Google Play style recycler in recyclers).
 
-Jubako can load content up front (via an **assembly** phase)  or load on the fly 
-(where recycler rows can be paginated into view and dependent data loaded asynchronously per row).
+Jubako can load content on the fly asynchronously, infinitely with pagination.
 
-## The simplest example - "Hello Jubako!"
+## The simplest example - "Hello Jubako! x 100"
 ```kotlin
 class HelloJubakoActivity : AppCompatActivity() {
 
@@ -41,6 +40,8 @@ Firstly the extension function `RecyclerView.withJubako` expresses which Recycle
 We can then make calls to Jubako's `withView` extension function to specify each view (just a regular `android.view.View`)  we wish
 to display for a row in our recycler that conveniently constructs the necessary boilerplate under the hood.
 
+In the example we just print out 100 rows of static content, but Jubako was built to do much more than that.
+
 **Mostly this approach might work for simple applications, but under the hood Jubako offers more verbose
 construction to support more complicated scenarios.** 
 
@@ -49,7 +50,7 @@ The best place to start right now with Jubako is to check it the examples in the
 ## JubakoAssembler
 Without the added convenience of Jubako `load` we can also load content with a derived implementation of `JubakoAssembler`. 
 
-An assembler (similar to an adapter) is used to compose a *list of descriptions* that we wish to render (carousels, cards, etc). 
+An assembler (similar to an adapter) is used to compose a **list of descriptions** that we wish to render (carousels, cards, etc). 
 Its basic interface has a single function `::assemble()` that will be called by Jubako when it is time to assemble this list.
 
 Content is added with the assembler by creating and adding instances of `ContentDescriptionProvider`, and the purpose of a provider
@@ -66,7 +67,13 @@ val assembler = SimpleJubakoAssembler {
 ```
 
 Jubako will call `JubakoAssembler::assemble()` asynchronously (via coroutines) and this will give your implementation
-the chance to perform initialisation work such as fetching data in order to construct this *list of descriptions*.
+the chance to perform initialisation work such as fetching data in order to construct this **list of descriptions**.
+
+You can tell Jubako that your assembler produces even more content if `::assemble` is called again
+by implementing `JubakoAssembler::hasMore` you can control how much more content you want Jubako to consume
+by returning `true` or `false` for more or no more content respectively.
+
+Jubako's OOTB `PaginatedContentLoadingStrategy` will take care of loading more when demanded.
 
 ### Waiting for assembly to complete
 When Jubako calls `JubakoAssembler::assemble` it will do so asynchronously which we refer to as the *Assembly Phase*

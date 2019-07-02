@@ -1,7 +1,7 @@
 package com.justeat.jubako
 
 /**
- * Wrapper round list to manage the insertion/deletion of loadedContentDescriptions blocks
+ * Wrapper round list to manage the insertion/deletion of destination blocks
  * and a convenient listener for adapter integrations
  */
 class ContentDescriptionCollection(var listener: Listener? = null) {

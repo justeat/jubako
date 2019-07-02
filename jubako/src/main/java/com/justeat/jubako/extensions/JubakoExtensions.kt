@@ -92,11 +92,11 @@ fun <T> MutableList<ContentDescriptionProvider<Any>>.addHolder(delegate: () -> J
     } as ContentDescriptionProvider<Any>)
 }
 
-fun MutableList<ContentDescriptionProvider<Any>>.addView(delegate: () -> View) {
+fun MutableList<ContentDescriptionProvider<Any>>.addView(delegate: (parent: ViewGroup) -> View) {
     add(descriptionProvider {
         ContentDescription(
             viewHolderFactory = viewHolderFactory {
-                object : JubakoViewHolder<Any>(delegate.invoke()) {
+                object : JubakoViewHolder<Any>(delegate.invoke(it)) {
                     override fun bind(data: Any?) {}
                 }
             })

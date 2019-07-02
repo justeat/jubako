@@ -95,10 +95,10 @@ class MoviesActivity : AppCompatActivity() {
             val list3 = app.assets.list("3").map { Movie("${ASSETS_FILE_PATH}3/$it".toUri()) }
 
             return listOf(
-                MovieGroup("Trending", list1),
-                MovieGroup("Popular on Jubako TV", list2),
-                MovieGroup("Recently Added", list3),
-                MovieGroup("Watch Again", list1),
+                MovieGroup("Trending", list1 + list1),
+                MovieGroup("Popular on Jubako Movies", list2 + list1),
+                MovieGroup("Recently Added", list3 + list2),
+                MovieGroup("Watch Again", list1 + list3),
                 MovieGroup("Leaving Soon", list2),
                 MovieGroup("Watch Later", list3)
             )

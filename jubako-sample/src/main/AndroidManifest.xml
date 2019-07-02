@@ -37,7 +37,7 @@
             android:label="Enterprise Hello" />
         <activity
             android:name=".MoviesActivity"
-            android:label="Jubako TV" />
+            android:label="Jubako Movies" />
         <activity
             android:name=".InfiniteHelloJubakoActivity"
             android:label="Infinite Hello" />

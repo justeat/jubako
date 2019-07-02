@@ -200,11 +200,11 @@ ContentDescription(
             }.run()
         }
     },
-    onReload = { contentDescription, data ->
-        contentDescription.data = object : LiveData<String>() {
+    onReload = { payload ->
+        data = object : LiveData<String>() {
             override fun onActive() {
                 thread {
-                    postValue("Peek-a-Boo! $data")
+                    postValue("Peek-a-Boo! $payload")
                 }.run()
             }
         }

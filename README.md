@@ -178,7 +178,7 @@ Jubako.observe(this) { state ->
 In the example above the common case for listening to `Assembling` is to show or hide loading indicators and handle
 any exceptions from the call to `::assemble()`.
 
-Although `Assembled` state will indicate the assembly phase completed, it may not be the best time to display content. As well as Jubako having the flexibility of an asynchronous assembly phase, once assembled, Jubako will proceed to fill up the screen with content by loading descriptions one by one filling down the screen and this could take time depending on what you assigned to each `ContentDescription::data` property - it would therefore best to know when the screen is filled and can do that by setting `JubakoAdapter::onInitialFill` described in the next section.
+Although `Assembled` state will indicate the assembly phase completed, it may not be the best time to display content. As well as Jubako having the flexibility of an asynchronous assembly phase, once assembled, Jubako will proceed to fill up the screen with content by loading descriptions one by one filling down the screen and this could take time depending on what you assigned to each `ContentDescription::data` property - it would therefore be best to know when the screen is filled and can you do that by setting `JubakoAdapter::onInitialFill` described in the next section.
 
 ## JubakoAdapter
 Once you observe the state `Jubako.State.Assembled` you can go ahead and construct your `JubakoAdapter`, by default the adapter will use `PaginatedContentLoadingStrategy`.

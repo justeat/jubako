@@ -1,6 +1,5 @@
 
 ![Alt text](gfx/jubako_logo.png?raw=true "Jubako Logo")
-
 [![](https://jitpack.io/v/justeat/jubako.svg)](https://jitpack.io/#justeat/jubako)
 
 <img align="right" src="https://github.com/justeat/jubako/blob/master/gfx/jubako_movies.png" />

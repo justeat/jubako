@@ -85,6 +85,44 @@ A factory class that will create a ViewHolder that you want to use when renderin
 The data that will be loaded where T can be any type, later on when rendering this data (when loaded) will be passed to your
 `ViewHolder`'s `bind(T)` that you can implement to render the loaded content.
 
+### Live Data Usage
+Jubako makes use of `LiveData<T>`, the way in which you should provide your data from `ContentDescription<T>::data`.
+
+When Jubako observes your data it expects you to `postValue` when your data is ready, the simplest implementation could be:-
+
+```kotlin
+ContentDescription(
+    viewHolderFactory = TestViewHolderFactory(),
+    data = object : LiveData<String>() {
+        override fun onActive() {
+            thread {
+                postValue("Hello, Jubako!")
+            }.run()
+        }
+    })
+```
+
+In the example, as soon as our first observer observes data, we `postValue("Hello, Jubako!")` and in doing so your corresponding `JubakoViewHolder` will recieve the data in a call to `bind(...)`.
+
+```kotlin
+class ExampleViewHolder(view: View) : JubakoViewHolder<String>(view) {
+    override fun bind(data: String?) {
+        // do something with data, like bind it to views (should be:- Hello Jubako!)
+    }
+}
+```
+
+You should always `postValue` regardless, because if you do not, then Jubako will think it needs to wait, and will wait currently wait for ever. The best strategy to employ would be to catch your exceptions and always deliver a result to `postValue(...)`
+
+In an enterprise implementation it would be common to assign data with the result of repository method with live data.
+
+```kotlin
+ContentDescription(
+    viewHolderFactory = TestViewHolderFactory(),
+    data = repository.getData()
+    })
+```
+
 ## Assembling content
 Without the added convenience of Jubako `load` we can also load content with a derived implementation of `JubakoAssembler`. 
 

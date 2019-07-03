@@ -47,7 +47,45 @@ construction to support more complicated scenarios.**
 
 The best place to start right now with Jubako is to check it the examples in the `jubako-sample` app in this repository.
 
-## JubakoAssembler
+## Describing your content
+For each row in Jubako is a `ContentDescription` that defines which view holder to use and which data to bind (in the form of `LiveData<T>`).
+
+With Jubako, when we assemble content for display using a `ContentAssembler`, we provide this content as a list of `ContentDescription` or more
+precisely a list of `ContentDescriptionProvider` where a providers purpose is to produce a description.
+
+The following example shows a basic implementation of a `ContentDescriptionProvider`.
+
+```kotlin
+class HelloContentDescriptionProvider(private val language: Language) : ContentDescriptionProvider<String> {
+    enum class Language { ENGLISH, JAPANESE }
+    
+    private val service = HelloService()
+    
+    override fun createDescription(): ContentDescription<String> {
+        return ContentDescription(
+            data = when (language) {
+                ENGLISH -> service.getHelloEnglish()
+                JAPANESE -> service.getHelloJapanese()
+            },
+            viewHolderFactory = HelloViewHolderFactory()
+        )
+    }
+}
+```
+A description has various properties of which some are required.
+
+#### id: String (optional)
+A unique ID that represents this row (use `UUID` to create one to keep things unique if a
+specific name is not important)
+
+#### viewHolderFactory: JubakoAdapter.HolderFactory<T> (required)
+A factory class that will create a ViewHolder that you want to use when rendering.
+
+#### data: LiveData<T>? (required)
+The data that will be loaded where T can be any type, later on when rendering this data (when loaded) will be passed to your
+`ViewHolder`'s `bind(T)` that you can implement to render the loaded content.
+
+## Assembling content
 Without the added convenience of Jubako `load` we can also load content with a derived implementation of `JubakoAssembler`. 
 
 An assembler (similar to an adapter) is used to compose a **list of descriptions** that we wish to render (carousels, cards, etc). 
@@ -111,44 +149,6 @@ where `Jubako.State.Assembled` when data is loaded.
 If any of your content descriptions have live data that takes some time to load it may be more appropriate to
 wait for the screen to fill by hooking into `onInitialFill` before transitioning from
 loading indicators to showing content.
-
-## Describing your content
-For each row in Jubako is a `ContentDescription` that defines which view holder to use and which data to bind (in the form of `LiveData<T>`).
-
-With Jubako, when we assemble content for display using a `ContentAssembler`, we provide this content as a list of `ContentDescription` or more
-precisely a list of `ContentDescriptionProvider` where a providers purpose is to produce a description.
-
-The following example shows a basic implementation of a `ContentDescriptionProvider`.
-
-```kotlin
-class HelloContentDescriptionProvider(private val language: Language) : ContentDescriptionProvider<String> {
-    enum class Language { ENGLISH, JAPANESE }
-    
-    private val service = HelloService()
-    
-    override fun createDescription(): ContentDescription<String> {
-        return ContentDescription(
-            data = when (language) {
-                ENGLISH -> service.getHelloEnglish()
-                JAPANESE -> service.getHelloJapanese()
-            },
-            viewHolderFactory = HelloViewHolderFactory()
-        )
-    }
-}
-```
-A description has various properties of which some are required.
-
-#### id: String (optional)
-A unique ID that represents this row (use `UUID` to create one to keep things unique if a
-specific name is not important)
-
-#### viewHolderFactory: JubakoAdapter.HolderFactory<T> (required)
-A factory class that will create a ViewHolder that you want to use when rendering.
-
-#### data: LiveData<T>? (required)
-The data that will be loaded where T can be any type, later on when rendering this data (when loaded) will be passed to your
-`ViewHolder`'s `bind(T)` that you can implement to render the loaded content.
 
 ## JubakoAdapter
 Once you observe the state `Jubako.State.Assembled` you can go ahead and construct your `JubakoAdapter`, by default the adapter will use `PaginatedContentLoadingStrategy`.

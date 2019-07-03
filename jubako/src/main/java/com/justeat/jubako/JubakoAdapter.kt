@@ -132,6 +132,7 @@ open class JubakoAdapter(
     private fun bindWhenNewOrDefault(item: ContentDescription<Any>, holder: JubakoViewHolder<Any>) {
         val data = item.data?.value
         if (data !== holder.data || data == null) {
+            holder.description = item
             holder.bind(data)
             holder.data = data
         }

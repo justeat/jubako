@@ -12,9 +12,10 @@ abstract class JubakoViewHolder<T>(itemView: View) : RecyclerView.ViewHolder(ite
 
     internal var reloader: ((position: Int, payload: Any?) -> Unit)? = null
     internal var onClickDelegate: ((id: Int) -> Unit)? = null
-    var logger = Jubako.logger
-
+    internal var description: ContentDescription<T>? = null
     internal var data: T? = null
+
+    var logger = Jubako.logger
 
     fun reload(payload: Any? = null) {
         val position = adapterPosition

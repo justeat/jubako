@@ -178,15 +178,7 @@ Jubako.observe(this) { state ->
 In the example above the common case for listening to `Assembling` is to show or hide loading indicators and handle
 any exceptions from the call to `::assemble()`.
 
-As well as these callbacks there is also a callback `onInitialFill` on `JubakoAdapter` that will be
-called when Jubako initially fills the screen with content. This callback can also be used to hide any loading indicators
-and show the content (the `RecyclerView`). The difference between this callback and `Jubako.State.Assembled`
-is that it occurs after data has loaded and the screen is filled for the first time
-where `Jubako.State.Assembled` when data is loaded.
-
-If any of your content descriptions have live data that takes some time to load it may be more appropriate to
-wait for the screen to fill by hooking into `onInitialFill` before transitioning from
-loading indicators to showing content.
+Although `Assembled` state will indicate the assembly phase completed, it may not be the best time to display content. As well as Jubako having the flexibility of an asynchronous assembly phase, once assembled, Jubako will proceed to fill up the screen with content by loading descriptions one by one filling down the screen and this could take time depending on what you assigned to each `ContentDescription::data` property - it would therefore best to know when the screen is filled and can do that by setting `JubakoAdapter::onInitialFill` described in the next section.
 
 ## JubakoAdapter
 Once you observe the state `Jubako.State.Assembled` you can go ahead and construct your `JubakoAdapter`, by default the adapter will use `PaginatedContentLoadingStrategy`.
@@ -204,6 +196,14 @@ Jubako.observe(this) { state ->
     }
 }
 ```
+
+### Initial Fill
+`JubakoAdapter` will invoke a callback `onInitialFill` that will when Jubako initially fills the screen with content. This callback can also be used to hide any loading indicatorsand show the content (the `RecyclerView`). The difference between this callback and `Jubako.State.Assembled`is that it occurs after data has loaded and the screen is filled for the first time
+where `Jubako.State.Assembled` when data is first loaded.
+
+If any of your content descriptions have live data that takes some time to load it may be more appropriate to
+wait for the screen to fill by hooking into `onInitialFill` before transitioning from
+loading indicators to showing content.
 
 ### Reloading
 sometimes you might need to reload a `ContentDescription`, you can do this from

@@ -60,7 +60,7 @@ will be bound to the view holder where that data is a `LiveData<T>`.
 The simplest usage of `JubakoAssembler` is using its derived type `SimpleJubakoAssembler` that adds convenience to
 assembling simple lists of content, for example:-
 
-```
+```kotlin
 val assembler = SimpleJubakoAssembler {
     add(HelloDescriptionProvider())
 }
@@ -120,7 +120,7 @@ precisely a list of `ContentDescriptionProvider` where a providers purpose is to
 
 The following example shows a basic implementation of a `ContentDescriptionProvider`.
 
-```
+```kotlin
 class HelloContentDescriptionProvider(private val language: Language) : ContentDescriptionProvider<String> {
     enum class Language { ENGLISH, JAPANESE }
     

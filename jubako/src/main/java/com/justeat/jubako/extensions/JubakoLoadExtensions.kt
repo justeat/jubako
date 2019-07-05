@@ -1,5 +1,3 @@
-@file:JvmName("JubakoExtensionsKt")
-
 package com.justeat.jubako.extensions
 
 import com.justeat.jubako.ContentDescriptionProvider

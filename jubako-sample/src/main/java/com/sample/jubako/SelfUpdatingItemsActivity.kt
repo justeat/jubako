@@ -10,8 +10,8 @@ import com.justeat.jubako.Jubako
 import com.justeat.jubako.JubakoViewHolder
 import com.justeat.jubako.extensions.addDescription
 import com.justeat.jubako.extensions.load
-import com.justeat.jubako.extensions.viewHolderFactory
 import com.justeat.jubako.extensions.withJubako
+import com.justeat.jubako.viewHolderFactory
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 
 class SelfUpdatingItemsActivity : AppCompatActivity() {

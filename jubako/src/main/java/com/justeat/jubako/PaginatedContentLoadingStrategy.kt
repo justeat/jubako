@@ -121,7 +121,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
                 hasPageWorth(data) -> {
                     dispatchPage(data.destination)
                     val hasMore = data.destination.size() < data.source.size || data.hasMore()
-                    if (hasMore && onLoaded(hasMore)) {
+                    if (onLoaded(hasMore) && hasMore) {
                         loadDescriptions(lifecycleOwner, data, onLoaded)
                     }
                 }

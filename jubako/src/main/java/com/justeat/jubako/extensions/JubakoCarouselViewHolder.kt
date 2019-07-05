@@ -3,6 +3,7 @@ package com.justeat.jubako.extensions
 import android.os.Parcelable
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import androidx.annotation.IdRes
 import androidx.lifecycle.*
 import androidx.recyclerview.widget.RecyclerView
@@ -97,6 +98,7 @@ open class CarouselViewHolder<ITEM, ITEM_HOLDER : RecyclerView.ViewHolder>(itemV
         }
     }
 
+    @CallSuper
     override fun bind(data: List<ITEM>?) {
         carouselViewBinder(this)
         recycler.adapter = createAdapter(data ?: emptyList())

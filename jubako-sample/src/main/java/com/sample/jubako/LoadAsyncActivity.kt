@@ -93,7 +93,7 @@ class LoadAsyncActivity : AppCompatActivity() {
         }
     }
 
-    data class Compartment(val priority: Int, val title: String, val items: List<String>)
+    data class Compartment(val title: String, val items: List<String>)
 
     class JubakoRepository {
         fun getCompartments(): List<Compartment> {
@@ -103,12 +103,10 @@ class LoadAsyncActivity : AppCompatActivity() {
 
             return listOf(
                 Compartment(
-                    1, "Sushi",
-                    listOf("Nigiri", "Sashimi", "Maki", "Uramaki", "Temaki")
+                    "Sushi", listOf("Nigiri", "Sashimi", "Maki", "Uramaki", "Temaki")
                 ),
                 Compartment(
-                    2, "Sashimi",
-                    listOf("Ahi", "Aji", "Amaebi", "Anago", "Aoyagi", "Bincho", "Katsuo")
+                    "Sashimi", listOf("Ahi", "Aji", "Amaebi", "Anago", "Aoyagi", "Bincho", "Katsuo")
                 )
             )
         }

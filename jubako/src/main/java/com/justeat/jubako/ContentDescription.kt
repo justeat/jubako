@@ -32,7 +32,13 @@ data class ContentDescription<T>(
      * Automatically generated ID can be overridden with a specific ID which can be used
      * to reference content when one wishes to [JubakoAdapter.reload]
      */
-    val id: String = UUID.randomUUID().toString()
+    val id: String = UUID.randomUUID().toString(),
+
+    /**
+     * Map of anything to cache arbitrary data pertaining to this description, Jubako will
+     * also use this map to store internal data using the prefix **jubako**, use with caution!
+     */
+    val cache: MutableMap<Any, Any> = mutableMapOf()
 ) {
 
     override fun equals(other: Any?): Boolean {

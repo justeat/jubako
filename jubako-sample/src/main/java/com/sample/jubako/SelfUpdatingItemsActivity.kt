@@ -26,7 +26,6 @@ class SelfUpdatingItemsActivity : AppCompatActivity() {
             for (i in 0..100) {
                 var counter = 0
                 addDescription(
-                    priority = i,
                     viewHolderFactory = viewHolderFactory { CountingViewHolder(it) },
                     data = object : LiveData<Int>() {
                         override fun onActive() {

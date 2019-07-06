@@ -9,10 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.extensions.CarouselViewHolder
-import com.justeat.jubako.extensions.addCarousel
-import com.justeat.jubako.extensions.loadAsync
-import com.justeat.jubako.extensions.withJubako
+import com.justeat.jubako.extensions.*
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 
 class LoadAsyncActivity : AppCompatActivity() {
@@ -60,7 +57,18 @@ class LoadAsyncActivity : AppCompatActivity() {
                         //
                         // The items (data) that will  bound to the carousel
                         //
-                        items = compartment.items,
+                        data = InstantLiveData(compartment),
+
+                        //
+                        // Get the item data at position in the data
+                        //
+                        itemData = { data, position -> data.items[position] },
+
+                        //
+                        // Get the number of items in data
+                        //
+                        itemCount = { data -> data.items.size },
+
                         //
                         // A factory to produce item view holders
                         //
@@ -112,7 +120,8 @@ class LoadAsyncActivity : AppCompatActivity() {
         }
     }
 
-    class CustomCarouselHolder(itemView: View) : CarouselViewHolder<String, SimpleCarouselItemViewHolder>(itemView) {
+    class CustomCarouselHolder(itemView: View) :
+        CarouselViewHolder<Compartment, String, SimpleCarouselItemViewHolder>(itemView) {
         val heading: TextView = itemView.findViewById(R.id.heading)
     }
 }

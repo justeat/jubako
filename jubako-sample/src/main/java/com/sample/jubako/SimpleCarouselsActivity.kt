@@ -30,14 +30,34 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         recyclerView.withJubako(this, pageSize(1)).load {
             (0 until 100).forEach { i ->
                 addCarousel(
+                    //
+                    // Inflate a view for our carousel
+                    //
                     carouselView = {
                         LayoutInflater.from(this@SimpleCarouselsActivity).inflate(R.layout.simple_carousel, it, false)
                     },
+                    //
+                    // Provide a lambda that will create our carousel item view holder
+                    //
                     itemViewHolder = { SimpleCarouselItemViewHolder(it) },
-                    itemData = when {
+                    //
+                    // Specify the data that will be loaded into the carousel
+                    //
+                    data = when {
                         i % 2 == 0 -> getNumbersEnglish()
                         else -> getNumbersJapanese()
                     },
+                    //
+                    // Provide a lambda that will fetch carousel item data by position
+                    //
+                    itemData = { data, position -> data[position] },
+                    //
+                    // Specify a lambda that will provide the count of item data in our carousel
+                    //
+                    itemCount = { data -> data.size },
+                    //
+                    // Specify a binder that will allow binding between data and item holder
+                    //
                     itemBinder = { holder, data ->
                         holder.itemView.findViewById<TextView>(R.id.text).text = data
                     }

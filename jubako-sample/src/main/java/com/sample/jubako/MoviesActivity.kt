@@ -13,10 +13,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.extensions.CarouselViewHolder
-import com.justeat.jubako.extensions.addCarousel
-import com.justeat.jubako.extensions.loadAsync
-import com.justeat.jubako.extensions.withJubako
+import com.justeat.jubako.extensions.*
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 
@@ -48,14 +45,10 @@ class MoviesActivity : AppCompatActivity() {
                         carouselViewBinder = { holder ->
                             holder.heading.text = group.title
                         },
-                        items = group.movies,
-                        //
-                        // A factory to produce item view holders
-                        //
+                        data = InstantLiveData(group),
+                        itemData = { data, position -> data.movies[position] },
+                        itemCount = { data -> data.movies.size },
                         itemViewHolder = { MovieItemViewHolder(it) },
-                        //
-                        // Perform binding of the item data to the holder
-                        //
                         itemBinder = { holder, data -> holder.bind(data) })
                 }
             }
@@ -105,7 +98,7 @@ class MoviesActivity : AppCompatActivity() {
         }
     }
 
-    class CustomCarouselHolder(itemView: View) : CarouselViewHolder<Movie, MovieItemViewHolder>(itemView) {
+    class CustomCarouselHolder(itemView: View) : CarouselViewHolder<MovieGroup, Movie, MovieItemViewHolder>(itemView) {
         val heading: TextView = itemView.findViewById(R.id.heading)
     }
 }

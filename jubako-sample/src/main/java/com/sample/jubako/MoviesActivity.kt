@@ -65,10 +65,15 @@ class MoviesActivity : AppCompatActivity() {
         recyclerView.isGone = true
     }
 
-    inner class MovieItemViewHolder(parent: ViewGroup) :
-        RecyclerView.ViewHolder(LayoutInflater.from(this).inflate(R.layout.carousel_item_movie, parent, false)) {
+    class MovieItemViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.carousel_item_movie,
+            parent,
+            false
+        )
+    ) {
 
-        val movieImageView = itemView.findViewById<ImageView>(R.id.movie)
+        private val movieImageView = itemView.findViewById<ImageView>(R.id.movie)
 
         fun bind(data: Movie?) {
             data?.apply {

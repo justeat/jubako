@@ -92,8 +92,13 @@ class LoadAsyncActivity : AppCompatActivity() {
         recyclerView.isGone = true
     }
 
-    inner class SimpleCarouselItemViewHolder(parent: ViewGroup) :
-        RecyclerView.ViewHolder(LayoutInflater.from(this).inflate(R.layout.simple_carousel_item_text, parent, false)) {
+    class SimpleCarouselItemViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
+        LayoutInflater.from(parent.context).inflate(
+            R.layout.simple_carousel_item_text,
+            parent,
+            false
+        )
+    ) {
         fun bind(data: String?) {
             itemView.findViewById<TextView>(R.id.text).apply {
                 text = data

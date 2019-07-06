@@ -8,7 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.extensions.addCarousel
+import com.justeat.jubako.extensions.addRecyclerView
 import com.justeat.jubako.extensions.load
 import com.justeat.jubako.extensions.pageSize
 import com.justeat.jubako.extensions.withJubako
@@ -29,11 +29,11 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         // Set page size to 1 so we can see it loading (descriptions are delayed by 500ms)
         recyclerView.withJubako(this, pageSize(1)).load {
             (0 until 100).forEach { i ->
-                addCarousel(
+                addRecyclerView(
                     //
                     // Inflate a view for our carousel
                     //
-                    carouselView = {
+                    view = {
                         LayoutInflater.from(this@SimpleCarouselsActivity).inflate(R.layout.simple_carousel, it, false)
                     },
                     //
@@ -56,7 +56,7 @@ class SimpleCarouselsActivity : AppCompatActivity() {
                     //
                     itemCount = { data -> data.size },
                     //
-                    // Specify a binder that will allow binding between data and item holder
+                    // Specify a viewBinder that will allow binding between data and item holder
                     //
                     itemBinder = { holder, data ->
                         holder.itemView.findViewById<TextView>(R.id.text).text = data

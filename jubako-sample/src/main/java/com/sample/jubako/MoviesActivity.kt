@@ -35,14 +35,14 @@ class MoviesActivity : AppCompatActivity() {
 
             for (i in 0..100) {
                 groups.forEach { group ->
-                    addCarousel(
-                        carouselViewHolder = {
+                    addRecyclerView(
+                        viewHolder = {
                             CustomCarouselHolder(
                                 layoutInflater.inflate(R.layout.carousel_movies, it, false)
                             )
                         },
-                        carouselRecyclerViewId = R.id.jubakoCarousel,
-                        carouselViewBinder = { holder ->
+                        recyclerViewId = R.id.jubakoCarousel,
+                        viewBinder = { holder ->
                             holder.heading.text = group.title
                         },
                         data = InstantLiveData(group),
@@ -103,7 +103,8 @@ class MoviesActivity : AppCompatActivity() {
         }
     }
 
-    class CustomCarouselHolder(itemView: View) : CarouselViewHolder<MovieGroup, Movie, MovieItemViewHolder>(itemView) {
+    class CustomCarouselHolder(itemView: View) :
+        JubakoRecyclerViewHolder<MovieGroup, Movie, MovieItemViewHolder>(itemView) {
         val heading: TextView = itemView.findViewById(R.id.heading)
     }
 }

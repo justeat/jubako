@@ -51,7 +51,7 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
     onReload: (ContentDescription<DATA>.(payload: Any?) -> Unit) = {}
 ) {
     add(descriptionProvider {
-        recyclerViewDescription(
+        recyclerViewContent(
             view,
             viewHolder,
             recyclerViewId,
@@ -87,7 +87,7 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
  * @param layoutManager Defaults to a [LinearLayoutManager] in [HORIZONTAL] orientation, replace for a custom layout
  * @param onReload See [ContentDescription.onReload]
  */
-fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder> recyclerViewDescription(
+fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder> recyclerViewContent(
     view: ((parent: ViewGroup) -> View)? = null,
     viewHolder: (parent: ViewGroup) -> HOLDER = defaultRecyclerViewHolder(view),
     @IdRes recyclerViewId: Int = View.NO_ID,

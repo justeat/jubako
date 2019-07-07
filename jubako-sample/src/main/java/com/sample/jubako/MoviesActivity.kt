@@ -11,12 +11,14 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.net.toUri
 import androidx.core.view.isGone
+import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.data.InstantLiveData
 import com.justeat.jubako.extensions.*
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
+import kotlin.random.Random
 
 class MoviesActivity : AppCompatActivity() {
 
@@ -31,8 +33,21 @@ class MoviesActivity : AppCompatActivity() {
             onAssembling = ::showLoading,
             onAssembled = { showContent() }).loadAsync {
 
-            // Call sleeps (by 4s) to simulate latency
-            val groups = MovieRepository(application).getMovies()
+            val repository = MovieRepository(application)
+
+            //
+            // Add a movie Hero Image
+            //
+            addView(
+                data = repository.getHeroMovie(),
+                viewBinder = { data, view ->
+                    data?.let {
+                        Picasso.get().load(it.assetUri).into(view.findViewById<ImageView>(R.id.movie))
+                    }
+                },
+                view = { layoutInflater.inflate(R.layout.item_movie_hero, it, false) })
+
+            val groups = repository.getMovies()
 
             for (i in 0..100) {
                 groups.forEach { group ->
@@ -87,12 +102,11 @@ class MoviesActivity : AppCompatActivity() {
     data class Movie(val assetUri: Uri)
 
     class MovieRepository(val app: Application) {
+        private val list1 = app.assets.list("1").map { Movie("${ASSETS_FILE_PATH}1/$it".toUri()) }
+        private val list2 = app.assets.list("2").map { Movie("${ASSETS_FILE_PATH}2/$it".toUri()) }
+        private val list3 = app.assets.list("3").map { Movie("${ASSETS_FILE_PATH}3/$it".toUri()) }
+
         fun getMovies(): List<MovieGroup> {
-
-            val list1 = app.assets.list("1").map { Movie("${ASSETS_FILE_PATH}1/$it".toUri()) }
-            val list2 = app.assets.list("2").map { Movie("${ASSETS_FILE_PATH}2/$it".toUri()) }
-            val list3 = app.assets.list("3").map { Movie("${ASSETS_FILE_PATH}3/$it".toUri()) }
-
             return listOf(
                 MovieGroup("Trending", list1 + list1),
                 MovieGroup("Popular on Jubako Movies", list2 + list1),
@@ -101,6 +115,16 @@ class MoviesActivity : AppCompatActivity() {
                 MovieGroup("Leaving Soon", list2),
                 MovieGroup("Watch Later", list3)
             )
+        }
+
+        fun getHeroMovie(): LiveData<Movie> {
+            return object : LiveData<Movie>() {
+                override fun onActive() {
+                    val all = list1 + list2 + list3
+                    val movie = all[random.nextInt(0, all.size)]
+                    postValue(movie)
+                }
+            }
         }
     }
 
@@ -111,3 +135,4 @@ class MoviesActivity : AppCompatActivity() {
 }
 
 private val ASSETS_FILE_PATH = "file:///android_asset/"
+private val random = Random(System.currentTimeMillis())

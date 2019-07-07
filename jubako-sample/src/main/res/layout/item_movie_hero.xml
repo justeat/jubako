@@ -47,7 +47,7 @@
         android:scaleType="fitCenter"
         android:text="Info"
         android:textAllCaps="false"
-        android:textSize="10sp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/playButton"
         app:layout_constraintLeft_toRightOf="@id/playButton"
         app:layout_constraintTop_toTopOf="@+id/playButton" />
@@ -63,7 +63,7 @@
         android:scaleType="fitCenter"
         android:text="My List"
         android:textAllCaps="false"
-        android:textSize="10sp"
+        android:textSize="12sp"
         app:layout_constraintBottom_toBottomOf="@+id/playButton"
         app:layout_constraintEnd_toStartOf="@+id/playButton"
         app:layout_constraintTop_toTopOf="@+id/playButton" />

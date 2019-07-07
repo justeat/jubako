@@ -9,14 +9,14 @@
     <ImageView
         android:id="@+id/movie"
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="380dp"
         android:scaleType="centerCrop"
         app:layout_constraintTop_toTopOf="parent" />
 
     <View
         android:id="@+id/view"
         android:layout_width="match_parent"
-        android:layout_height="320dp"
+        android:layout_height="380dp"
         android:background="@drawable/movie_hero_gradient"
         android:scaleType="centerCrop"
         app:layout_constraintTop_toTopOf="parent" />

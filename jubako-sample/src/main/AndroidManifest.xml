@@ -37,6 +37,7 @@
             android:label="Enterprise Hello" />
         <activity
             android:name=".MoviesActivity"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             android:label="Jubako Movies" />
         <activity
             android:name=".InfiniteHelloJubakoActivity"

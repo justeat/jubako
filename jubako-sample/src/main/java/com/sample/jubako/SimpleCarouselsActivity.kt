@@ -32,7 +32,7 @@ class SimpleCarouselsActivity : AppCompatActivity() {
                 addRecyclerView(
                     //
                     // Inflate a view for our carousel
-                    //x
+                    //
                     view = {
                         LayoutInflater.from(this@SimpleCarouselsActivity).inflate(R.layout.simple_carousel, it, false)
                     },

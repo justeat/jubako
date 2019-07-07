@@ -145,7 +145,6 @@ class EnterpriseHelloJubakoActivity : AppCompatActivity() {
     }
 }
 
-
 //
 // Simulate for some random delay
 //

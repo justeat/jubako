@@ -2,6 +2,7 @@ package com.justeat.jubako
 
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
+import kotlinx.coroutines.CoroutineScope
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -13,6 +14,12 @@ class PaginatedContentLoadingStrategyTest {
     @Mock
     lateinit var lifecycleOwner: LifecycleOwner
 
+    @Mock
+    lateinit var scope: CoroutineScope
+
+    @Mock
+    lateinit var assembler: JubakoAssembler
+
     @Before
     fun setUp() {
         MockitoAnnotations.initMocks(this)
@@ -23,10 +30,10 @@ class PaginatedContentLoadingStrategyTest {
     fun load_loads_page_at_a_time() {
         val paginatedLoadingStrategy = PaginatedContentLoadingStrategy(5)
 
-        val source = mutableListOf<ContentDescription<Any>>()
-        val destination = ContentDescriptionCollection()
-        (0..21).forEach {
-            source.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
+        val data = Jubako.Data(scope, assembler)
+
+        repeat((0..21).count()) {
+            data.source.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
                 override fun createViewHolder(parent: ViewGroup): JubakoViewHolder<String> = null!!
             }) as ContentDescription<Any>)
         }
@@ -34,10 +41,9 @@ class PaginatedContentLoadingStrategyTest {
         // First five
         paginatedLoadingStrategy.load(
             lifecycleOwner,
-            source = source,
-            destination = destination,
+            data,
             onLoaded = { hasMore: Boolean ->
-                assertEquals(5, destination.size())
+                assertEquals(5, data.destination.size())
                 assertTrue(hasMore)
                 false
             })
@@ -45,10 +51,9 @@ class PaginatedContentLoadingStrategyTest {
         // Second five (now 10)
         paginatedLoadingStrategy.load(
             lifecycleOwner,
-            source = source,
-            destination = destination,
+            data,
             onLoaded = { hasMore: Boolean ->
-                assertEquals(10, destination.size())
+                assertEquals(10, data.destination.size())
                 assertTrue(hasMore)
                 false
             })
@@ -56,10 +61,9 @@ class PaginatedContentLoadingStrategyTest {
         // Third five (now 15)
         paginatedLoadingStrategy.load(
             lifecycleOwner,
-            source = source,
-            destination = destination,
+            data,
             onLoaded = { hasMore: Boolean ->
-                assertEquals(15, destination.size())
+                assertEquals(15, data.destination.size())
                 assertTrue(hasMore)
                 false
             })
@@ -67,10 +71,9 @@ class PaginatedContentLoadingStrategyTest {
         // Fourth five (now 20)
         paginatedLoadingStrategy.load(
             lifecycleOwner,
-            source = source,
-            destination = destination,
+            data,
             onLoaded = { hasMore: Boolean ->
-                assertEquals(20, destination.size())
+                assertEquals(20, data.destination.size())
                 assertTrue(hasMore)
                 false
             })
@@ -78,10 +81,9 @@ class PaginatedContentLoadingStrategyTest {
         // Last two (now 22)
         paginatedLoadingStrategy.load(
             lifecycleOwner,
-            source = source,
-            destination = destination,
+            data,
             onLoaded = { hasMore: Boolean ->
-                assertEquals(22, destination.size())
+                assertEquals(22, data.destination.size())
                 assertFalse(hasMore)
                 false
             })
@@ -89,10 +91,9 @@ class PaginatedContentLoadingStrategyTest {
         // Calling again should do nothing but invoke the callback
         paginatedLoadingStrategy.load(
             lifecycleOwner,
-            source = source,
-            destination = destination,
+            data,
             onLoaded = { hasMore: Boolean ->
-                assertEquals(22, destination.size())
+                assertEquals(22, data.destination.size())
                 assertFalse(hasMore)
                 false
             })

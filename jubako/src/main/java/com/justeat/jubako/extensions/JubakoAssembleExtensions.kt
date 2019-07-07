@@ -1,7 +1,5 @@
 package com.justeat.jubako.extensions
 
-import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.LiveData
 import com.justeat.jubako.*
 import com.justeat.jubako.data.EmptyLiveData
@@ -31,17 +29,6 @@ fun <T> JubakoMutableList.addHolder(delegate: () -> JubakoViewHolder<T>) {
     add(descriptionProvider {
         ContentDescription(
             viewHolderFactory = viewHolderFactory { delegate.invoke() })
-    })
-}
-
-fun JubakoMutableList.addView(delegate: (parent: ViewGroup) -> View) {
-    add(descriptionProvider {
-        ContentDescription(
-            viewHolderFactory = viewHolderFactory {
-                object : JubakoViewHolder<Any>(delegate.invoke(it)) {
-                    override fun bind(data: Any?) {}
-                }
-            })
     })
 }
 

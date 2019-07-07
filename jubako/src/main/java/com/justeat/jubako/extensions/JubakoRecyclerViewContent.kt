@@ -17,7 +17,7 @@ import com.justeat.jubako.viewHolderFactory
 
 /**
  * Convenience function to add a [RecyclerView] into the list to present data as carousels, grids, etc,
- * be default a [LinearLayoutManager] is configured in [HORIZONTAL] orientation
+ * by default a [LinearLayoutManager] is configured in [HORIZONTAL] orientation.
  *
  * @param view  An inflated view for your holder must contain a [RecyclerView] as the root view
  * unless specified by [recyclerViewId]. This is not used if you are providing your own custom [JubakoRecyclerViewHolder]
@@ -132,6 +132,9 @@ internal fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLD
 /**
  * An implementation of [JubakoViewHolder] setup with a [RecyclerView] and easy callback functions for generic
  * view holder creation and data binding.
+ *
+ * Not normally used directly, use derived types with [addRecyclerView] or [recyclerViewContent] functions when
+ * assembling content.
  */
 open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>(itemView: View) :
     JubakoViewHolder<DATA>(itemView) {

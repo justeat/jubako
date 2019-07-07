@@ -34,6 +34,7 @@ import com.justeat.jubako.viewHolderFactory
  * @param itemViewHolder Specify a custom [RecyclerView.ViewHolder] to use for your recycler view items.
  * @param itemBinder Optionally specify a lambda where you can bind [ITEM_DATA] to [ITEM_HOLDER]
  * @param layoutManager Defaults to a [LinearLayoutManager] in [HORIZONTAL] orientation, replace for a custom layout
+ * @param onReload See [ContentDescription.onReload]
  */
 fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM_DATA, ITEM_HOLDER :
 RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
@@ -46,10 +47,11 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
     itemCount: (data: DATA) -> Int,
     itemViewHolder: (parent: ViewGroup) -> ITEM_HOLDER,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
-    layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) }
+    layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
+    onReload: (ContentDescription<DATA>.(payload: Any?) -> Unit) = {}
 ) {
     add(descriptionProvider {
-        recyclerViewContentDescription(
+        recyclerViewDescription(
             view,
             viewHolder,
             recyclerViewId,
@@ -59,7 +61,8 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
             itemCount,
             itemViewHolder,
             itemBinder,
-            layoutManager
+            layoutManager,
+            onReload
         )
     })
 }
@@ -82,8 +85,9 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
  * @param itemViewHolder Specify a custom [RecyclerView.ViewHolder] to use for your recycler view items.
  * @param itemBinder Optionally specify a lambda where you can bind [ITEM_DATA] to [ITEM_HOLDER]
  * @param layoutManager Defaults to a [LinearLayoutManager] in [HORIZONTAL] orientation, replace for a custom layout
+ * @param onReload See [ContentDescription.onReload]
  */
-fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder> recyclerViewContentDescription(
+fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder> recyclerViewDescription(
     view: ((parent: ViewGroup) -> View)? = null,
     viewHolder: (parent: ViewGroup) -> HOLDER = defaultRecyclerViewHolder(view),
     @IdRes recyclerViewId: Int = View.NO_ID,
@@ -93,7 +97,8 @@ fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM
     itemCount: (data: DATA) -> Int,
     itemViewHolder: (parent: ViewGroup) -> ITEM_HOLDER,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
-    layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) }
+    layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
+    onReload: (ContentDescription<DATA>.(payload: Any?) -> Unit) = {}
 ): ContentDescription<DATA> {
     return ContentDescription(
         viewHolderFactory = viewHolderFactory { parent ->
@@ -109,7 +114,8 @@ fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM
                 holder.layoutManager = layoutManager
             }
         },
-        data = data
+        data = data,
+        onReload = onReload
     )
 }
 

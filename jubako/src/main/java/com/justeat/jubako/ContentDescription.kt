@@ -1,6 +1,7 @@
 package com.justeat.jubako
 
 import androidx.lifecycle.LiveData
+import com.justeat.jubako.data.EmptyLiveData
 import java.util.*
 
 /**
@@ -16,7 +17,7 @@ data class ContentDescription<T>(
     /**
      * Assign the [data] that will be observed and passed to [JubakoViewHolder.bind]
      */
-    var data: LiveData<T>? = null,
+    var data: LiveData<T> = EmptyLiveData(),
 
     /**
      * Will be called before a reload via [JubakoAdapter.reload] with an optional payload.

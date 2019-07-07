@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
 import com.justeat.jubako.*
+import com.justeat.jubako.data.EmptyLiveData
 import java.util.*
 
 typealias ListReceiver = MutableList<ContentDescriptionProvider<Any>>.() -> Unit
@@ -46,7 +47,7 @@ fun JubakoMutableList.addView(delegate: (parent: ViewGroup) -> View) {
 
 fun <T> MutableList<ContentDescriptionProvider<Any>>.addDescription(
     viewHolderFactory: JubakoAdapter.HolderFactory<T>,
-    data: LiveData<T>? = null,
+    data: LiveData<T> = EmptyLiveData(),
     onReload: (ContentDescription<T>.(payload: Any?) -> Unit) = { },
     id: String = UUID.randomUUID().toString()
 ) {

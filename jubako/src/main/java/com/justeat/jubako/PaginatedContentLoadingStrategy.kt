@@ -3,6 +3,7 @@ package com.justeat.jubako
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
+import com.justeat.jubako.data.EmptyLiveData
 
 open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_PAGE_SIZE) : ContentLoadingStrategy {
     private var reset: Boolean = false
@@ -95,12 +96,21 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         currentDescription = data.source[data.destination.size() + pagedDescriptions.size]
         logger.log(TAG, "Load Description", "$currentDescription")
 
-        currentDescription?.data?.let {
-            logger.log(TAG, "Observe Description", "$currentDescription")
-            val observer = LoadDescriptionObserver(it, lifecycleOwner, data, onLoaded)
-            loadingData[observer] = it
-            it.observe(lifecycleOwner, observer)
-        } ?: proceed(lifecycleOwner, data, onLoaded)
+        currentDescription?.let { description ->
+            description.data.let {
+                when (it) {
+                    is EmptyLiveData -> {
+                        proceed(lifecycleOwner, data, onLoaded)
+                    }
+                    else -> {
+                        logger.log(TAG, "Observe Description", "$currentDescription")
+                        val observer = LoadDescriptionObserver(it, lifecycleOwner, data, onLoaded)
+                        loadingData[observer] = it
+                        it.observe(lifecycleOwner, observer)
+                    }
+                }
+            }
+        }
     }
 
     private fun proceed(

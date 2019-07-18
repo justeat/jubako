@@ -25,7 +25,7 @@ open class JubakoAdapter(
     }
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        logger.log("On Attach", "total rows: ${data.source.size}")
+        logger.log(TAG, "On Attach", "total rows: ${data.source.size}")
         setupLoadMoreScrollTrigger(recyclerView)
         initialFillOnLayoutChanged(recyclerView)
         listenForContentChanges()
@@ -41,6 +41,7 @@ open class JubakoAdapter(
     }
 
     private fun initialFillOnLayoutChanged(recyclerView: RecyclerView) {
+        logger.log(TAG, "Initial Fill Down", "begin...")
         initialFill(recyclerView)
 
         //
@@ -60,7 +61,7 @@ open class JubakoAdapter(
                 oldBottom: Int
             ) {
                 recyclerView.removeOnLayoutChangeListener(this)
-                logger.log("Initial Fill", "On Layout")
+                logger.log(TAG, "Initial Fill Down", "On Layout")
 
                 initialFill(recyclerView)
             }
@@ -76,17 +77,18 @@ open class JubakoAdapter(
             val lastPos =
                 (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
             logger.log(
-                "Initial Fill",
+                TAG,
+                "Initial Fill Down",
                 "last visible item pos: $lastPos, previously: $lastTimeVisibleItemPos"
             )
             when {
                 canLoadMoreDescriptions(hasMore, lastPos, lastTimeVisibleItemPos) -> {
-                    logger.log("Initial Fill", "filling screen...")
+                    logger.log(TAG, "Initial Fill Down", "fill more...")
                     lastTimeVisibleItemPos = lastPos
                     true
                 }
                 else -> {
-                    logger.log("Initial Fill", "Complete")
+                    logger.log(TAG, "Initial Fill Down", "Complete")
                     onInitialFill()
                     false
                 }
@@ -109,6 +111,7 @@ open class JubakoAdapter(
         holder.logger = logger
 
         logger.log(
+            TAG,
             "Create View Holder",
             "id: ${data.viewTypes[viewType]}, viewType: $viewType, type: ${holder.javaClass.simpleName}"
         )
@@ -116,7 +119,7 @@ open class JubakoAdapter(
     }
 
     override fun onBindViewHolder(holder: JubakoViewHolder<Any>, position: Int) {
-        logger.log("Bind ViewHolder")
+        logger.log(TAG, "Bind ViewHolder")
 
         val item = data.getItem(position)
 
@@ -130,7 +133,7 @@ open class JubakoAdapter(
     }
 
     private fun bindWhenNewOrDefault(item: ContentDescription<Any>, holder: JubakoViewHolder<Any>) {
-        val data = item.data?.value
+        val data = item.data.value
         if (data !== holder.data || data == null) {
             holder.description = item
             holder.bind(data)
@@ -173,9 +176,9 @@ open class JubakoAdapter(
                 val offset = recyclerView.computeVerticalScrollOffset()
                 val range = recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent()
                 if (range != 0 && offset > range * 0.8f) {
-                    logger.log("Scroll Trigger Load")
+                    logger.log(TAG, "Scroll Trigger Load")
                     loadingStrategy.load(lifecycleOwner, data) {
-                        logger.log("Scroll Trigger Load Complete")
+                        logger.log(TAG, "Scroll Trigger Load Complete")
                         false
                     }
                 }
@@ -191,7 +194,7 @@ open class JubakoAdapter(
         item?.onReload?.apply {
             invoke(item, payload)
             if (data.loaded(item)) {
-                logger.log("Reload", "description: $contentDescriptionId, position: $position")
+                logger.log(TAG, "Reload", "description: $contentDescriptionId, position: $position")
                 loadingStrategy.reload(lifecycleOwner, position, data.destination)
             }
         }
@@ -207,3 +210,5 @@ open class JubakoAdapter(
 
     var onViewHolderEvent: (event: Event) -> Unit = { }
 }
+
+private val TAG = JubakoAdapter::class.java.simpleName

@@ -4,6 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.justeat.jubako.data.EmptyLiveData
+import com.justeat.jubako.data.PaginatedLiveData
 
 open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_PAGE_SIZE) : ContentLoadingStrategy {
     private var reset: Boolean = false
@@ -107,6 +108,10 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
                         val observer = LoadDescriptionObserver(it, lifecycleOwner, data, onLoaded)
                         loadingData[observer] = it
                         it.observe(lifecycleOwner, observer)
+                        if (it is PaginatedLiveData<*>) {
+                            // Initial load (first page)
+                            it.loadMore()
+                        }
                     }
                 }
             }
@@ -154,7 +159,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         val item = descriptions[position]
         val data = item.data
 
-        data?.let {
+        data.let {
             val observer = ReloadDescriptionObserver(it, position, descriptions)
             loadingData[observer] = it
             it.observe(lifecycleOwner, observer)
@@ -169,9 +174,13 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
     ) : Observer<Any>,
         Cancellable {
         override var cancelled = false
-        override fun onChanged(t: Any?) {
+        override fun onChanged(data: Any?) {
             loadingData.remove(this)
-            data.removeObserver(this)
+            this.data.removeObserver(this)
+            if (data is PaginatedLiveData.State<*>) {
+                logger.log(TAG, "Accept Live Data Page", "$currentDescription")
+                data.accept()
+            }
             if (!cancelled) {
                 proceed(lifecycleOwner, jubakoData, onLoaded)
             } else {

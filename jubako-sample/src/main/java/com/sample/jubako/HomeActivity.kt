@@ -42,6 +42,10 @@ class HomeActivity : AppCompatActivity() {
         sampleInfiniteHello.setOnClickListener {
             startActivity(Intent(this, InfiniteHelloJubakoActivity::class.java))
         }
+
+        sampleGridFill.setOnClickListener {
+            startActivity(Intent(this, GridFillActivity::class.java))
+        }
     }
 }
 

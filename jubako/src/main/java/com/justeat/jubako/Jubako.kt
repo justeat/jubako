@@ -137,11 +137,15 @@ open class Jubako : ViewModel(), CoroutineScope {
     open class Logger(var enabled: Boolean) {
         open val tag = Jubako::class.java.simpleName!!
 
-        open fun log(state: String, message: String = "") {
-            if (enabled) log(tag, state, message)
+        open fun log(state: String) {
+            if (enabled) Log.d(tag, "[$state]")
         }
 
-        open fun log(tag: String, state: String, message: String = "") {
+        open fun log(tag: String, state: String) {
+            if (enabled) Log.d(tag, "[$state]")
+        }
+
+        open fun log(tag: String, state: String, message: String) {
             if (enabled) Log.d(tag, "[$state] $message")
         }
     }

@@ -46,6 +46,10 @@ class PaginatedLiveData<T>(private val paging: Pager<T>.() -> Unit) : LiveData<P
             }
             return false
         }
+
+        fun ready(): Boolean {
+            return !loading && error == null
+        }
     }
 
     fun loadMore() {
@@ -58,18 +62,18 @@ class PaginatedLiveData<T>(private val paging: Pager<T>.() -> Unit) : LiveData<P
             Jubako.logger.log(TAG, "Loading More")
             paging(pager)
 
-          //  postValue(State(loaded = loaded, page = emptyList(), loading = true))
+            value = State(loaded = loaded, page = emptyList(), loading = true)
 
             loadingJob = launch(io) {
                 try {
                     val page = pager.nextPage()
-                    loadingJob = null
                     loaded = loaded + page
                     Jubako.logger.log(TAG, "Page Loaded", "size: ${page.size}, total:${loaded.size}")
+                    loadingJob = null
                     postValue(State(loaded = loaded, page = page))
                 } catch (error: Throwable) {
-                    loadingJob = null
                     Jubako.logger.log(TAG, "Page Error", "${Log.getStackTraceString(error)}")
+                    loadingJob = null
                     postValue(State(loaded = loaded, page = emptyList(), error = error))
                 }
             }

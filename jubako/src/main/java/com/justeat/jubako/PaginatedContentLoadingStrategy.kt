@@ -175,12 +175,20 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         Cancellable {
         override var cancelled = false
         override fun onChanged(data: Any?) {
-            loadingData.remove(this)
-            this.data.removeObserver(this)
             if (data is PaginatedLiveData.State<*>) {
                 logger.log(TAG, "Accept Live Data Page", "$currentDescription")
                 data.accept()
+                if (!data.loading) {
+                    proceed()
+                }
+            } else {
+                proceed()
             }
+        }
+
+        private fun proceed() {
+            loadingData.remove(this)
+            this.data.removeObserver(this)
             if (!cancelled) {
                 proceed(lifecycleOwner, jubakoData, onLoaded)
             } else {

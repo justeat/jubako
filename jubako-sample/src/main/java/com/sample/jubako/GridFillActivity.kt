@@ -4,15 +4,13 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.SystemClock
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.data.PaginatedLiveData
-import com.justeat.jubako.extensions.addRecyclerView
-import com.justeat.jubako.extensions.load
-import com.justeat.jubako.extensions.pageSize
-import com.justeat.jubako.extensions.withJubako
+import com.justeat.jubako.extensions.*
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*
 import kotlin.random.Random
 import kotlin.random.nextInt
@@ -61,26 +59,57 @@ class GridFillActivity : AppCompatActivity() {
                                 else -> Color.WHITE
                             }
                         )
-                    }
+                    },
+                    //
+                    // A custom progress view holder for this carousel
+                    //
+                    progressViewHolder = { ProgressViewHolder(it) }
                 )
             }
         }
     }
 
+    //
+    // A simple holder for a carousel item
+    //
     inner class SimpleCarouselItemViewHolder(parent: ViewGroup) :
         RecyclerView.ViewHolder(LayoutInflater.from(this).inflate(R.layout.grid_cell, parent, false))
 
+    //
+    // A custom holder to show progress and error-retry state
+    //
+    class ProgressViewHolder(parent: ViewGroup) :
+        RecyclerView.ViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.grid_fill_progress, parent, false)
+        ), ProgressView {
+        override fun setRetryCallback(retry: () -> Unit) {
+            itemView.findViewById<View>(R.id.button_retry).setOnClickListener {
+                retry.invoke()
+            }
+        }
+
+        override fun onProgress() {
+            itemView.findViewById<View>(R.id.progress).visibility = View.VISIBLE
+            itemView.findViewById<View>(R.id.button_retry).visibility = View.GONE
+        }
+
+        override fun onError(error: Throwable) {
+            itemView.findViewById<View>(R.id.progress).visibility = View.GONE
+            itemView.findViewById<View>(R.id.button_retry).visibility = View.VISIBLE
+        }
+    }
+
     companion object {
         val random = Random(SystemClock.uptimeMillis())
-        val crashRate = 0 // crashes 1/10 times
+        val crashRate = 1 // crashes 1/10 times
 
         fun getGridCell(offset: Int): PaginatedLiveData<Boolean> {
             return PaginatedLiveData {
                 hasMore = { loaded.size < 100 }
                 nextPage = {
-//                    if (random.nextInt(0..10) <= Math.min(crashRate, 10)) {
-//                        throw RuntimeException("Error")
-//                    }
+                    if (random.nextInt(1..10) <= Math.min(crashRate, 10)) {
+                        throw RuntimeException("Error")
+                    }
                     listOf(((offset + loaded.size) % 2 == 0))
                 }
             }

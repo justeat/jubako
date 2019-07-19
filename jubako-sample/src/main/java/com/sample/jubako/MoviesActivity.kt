@@ -65,7 +65,8 @@ class MoviesActivity : AppCompatActivity() {
                         itemData = { data, position -> data.movies[position] },
                         itemCount = { data -> data.movies.size },
                         itemViewHolder = { MovieItemViewHolder(it) },
-                        itemBinder = { holder, data -> holder.bind(data) })
+                        itemBinder = { holder, data -> holder.bind(data) }
+                    )
                 }
             }
         }

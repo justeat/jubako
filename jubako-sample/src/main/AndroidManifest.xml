@@ -42,5 +42,9 @@
         <activity
             android:name=".InfiniteHelloJubakoActivity"
             android:label="Infinite Hello" />
+
+        <activity
+            android:name=".GridFillActivity"
+            android:label="Grid Fill" />
     </application>
 </manifest>

@@ -73,7 +73,8 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
             itemViewHolder,
             itemBinder,
             layoutManager,
-            onReload
+            onReload,
+            progressViewHolder
         )
     })
 }
@@ -134,6 +135,7 @@ fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM
                 holder.lifecycleOwner = (parent.context).takeIf { it is LifecycleOwner }?.let { it as LifecycleOwner }
                 holder.layoutManager = layoutManager
                 holder.paginatedLiveData = if (data is PaginatedLiveData<*>) data else null
+                holder.progressViewHolder = progressViewHolder
             }
         },
         data = data,
@@ -223,7 +225,7 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         itemData = itemData,
         itemCount = itemCount,
         paginatedLiveData = paginatedLiveData,
-        progressViewHolder = { parent -> DefaultProgressViewHolder(parent) }
+        progressViewHolder = progressViewHolder
     )
 
     class DefaultProgressViewHolder(parent: ViewGroup, layoutId: Int = R.layout.default_progress) :

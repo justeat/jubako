@@ -1,6 +1,7 @@
 package com.justeat.jubako.extensions
 
 import android.content.Context
+import android.graphics.Rect
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
@@ -15,6 +16,7 @@ import com.justeat.jubako.*
 import com.justeat.jubako.R
 import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.data.PaginatedLiveData.State
+import com.justeat.jubako.data.ready
 
 /**
  * Convenience function to add a [RecyclerView] into the list to present data as carousels, grids, etc,
@@ -266,7 +268,8 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
             const val VIEW_TYPE_PROGRESS = Int.MAX_VALUE
         }
 
-        private var currentState: State<*>? = null
+        private var progressPos: Int = 0
+        private var currentState: State<*>? = paginatedLiveData?.value
 
         var previousLastVisibleItemPos = Int.MIN_VALUE
         private var scrollListener: RecyclerView.OnScrollListener? = null
@@ -297,20 +300,21 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            logger.log(TAG, "Bind View Holder", "position: $position")
-
             currentState?.let { state ->
                 when {
                     state.loading && position == state.loaded.size -> {
+                        logger.log(TAG, "Bind View Holder (progress)", "position: $position")
                         (holder as ProgressView).onProgress()
                     }
                     state.error != null && position == state.loaded.size -> {
+                        logger.log(TAG, "Bind View Holder (error)", "position: $position")
                         (holder as ProgressView).onError(state.error!!)
                         (holder as ProgressView).setRetryCallback {
                             paginatedLiveData?.loadMore()
                         }
                     }
                     else -> {
+                        logger.log(TAG, "Bind View Holder", "position: $position")
                         itemBinder(holder as ITEM_HOLDER, itemData(state as DATA, position))
                     }
                 }
@@ -330,43 +334,67 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
                         logger.log(TAG, "Observe State", "$state")
                         if (state!!.accept()) {
                             val previousState = currentState
-
-                            //
-                            // Remove any loading or error state from previously
-                            //
-                            if (previousState != null) {
-                                when {
-                                    (!previousState.ready() && state.ready()) -> {
-                                        notifyItemRemoved(previousState.loaded.size)
-                                        notifyAndContinue(state, recyclerView)
-                                    }
-                                    (previousState.ready() && !state.ready()) -> {
-                                        notifyItemInserted(state.loaded.size)
-                                    }
-                                    state.error != null -> {
-                                        notifyItemChanged(state.loaded.size)
+                            when {
+                                (!previousState.ready() && state.ready()) -> {
+                                    logger.log(
+                                        TAG,
+                                        "Notify Item Removed (progress)",
+                                        "item: $progressPos"
+                                    )
+                                    notifyItemRemoved(progressPos)
+                                    notifyAndContinue(state, recyclerView)
+                                }
+                                (previousState.ready() && !state.ready()) -> {
+                                    progressPos = state.loaded.size
+                                    logger.log(
+                                        TAG,
+                                        "Notify Item Inserted (progress)",
+                                        "item: $progressPos"
+                                    )
+                                    notifyItemInserted(progressPos)
+                                }
+                                state.error != null -> {
+                                    logger.log(
+                                        TAG,
+                                        "Notify Item Changed (error)",
+                                        "item: $progressPos"
+                                    )
+                                    notifyItemChanged(progressPos)
+                                }
+                                state.loading -> {
+                                    if (previousState == null) {
+                                        progressPos = state.loaded.size
+                                        logger.log(
+                                            TAG,
+                                            "Notify Item Inserted (loading)",
+                                            "item: $progressPos"
+                                        )
+                                        notifyItemInserted(progressPos)
+                                    } else {
+                                        logger.log(
+                                            TAG,
+                                            "Notify Item Changed (loading)",
+                                            "item: $progressPos"
+                                        )
+                                        notifyItemChanged(progressPos)
                                     }
                                 }
-                            } else if (!state.ready()) {
-                                if (state.loading) {
-                                    logger.log(TAG, "Carousel Page Loading", "")
-                                } else {
-                                    logger.log(TAG, "Carousel Page Load Error", "")
+                                else -> {
+                                    logger.log(TAG, "Case 5", "")
+                                    notifyAndContinue(state, recyclerView)
                                 }
-                                notifyItemInserted(state.loaded.size)
-                            } else {
-                                notifyAndContinue(state, recyclerView)
                             }
 
                             currentState = state
                         }
                     })
                 }
+                setupLoadMoreScrollTrigger(recyclerView)
+                initialFillBegin(recyclerView)
             }
-
-            setupLoadMoreScrollTrigger(recyclerView)
-            initialFillBegin(recyclerView)
         }
+
+        var x = false
 
         private fun notifyAndContinue(state: State<*>, recyclerView: RecyclerView) {
             logger.log(TAG, "Carousel Page Loaded", "")
@@ -404,7 +432,6 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         private fun initialFillBegin(recyclerView: RecyclerView) {
             logger.log(TAG, "Initial Fill Across", "begin...")
             paginatedLiveData?.loadMore()
-
             initialFillOnLayoutChanged(recyclerView)
         }
 
@@ -421,21 +448,37 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
                     oldRight: Int,
                     oldBottom: Int
                 ) {
-                    recyclerView.removeOnLayoutChangeListener(this)
                     logger.log(TAG, "Initial Fill Across", "On Layout")
 
-                    paginatedLiveData?.loadMore()
+                    val dm = recyclerView.resources.displayMetrics
+                    val lm = (recyclerView.layoutManager as LinearLayoutManager)
+                    val lastVisibleItemPos = lm.findLastVisibleItemPosition()
+                    if (lastVisibleItemPos != RecyclerView.NO_POSITION) {
+                        val view = recyclerView.findViewHolderForAdapterPosition(lastVisibleItemPos)
+                        if (view != null) {
+                            val rect = Rect()
+                            view.itemView.getGlobalVisibleRect(rect)
+                            logger.log(
+                                TAG,
+                                "Initial Fill Across",
+                                "pos: $lastVisibleItemPos, right: $right, rect: $rect"
+                            )
+                            if (paginatedLiveData?.hasMore == false || rect.right >= right) {
+                                recyclerView.removeOnLayoutChangeListener(this)
+                            } else {
+                                paginatedLiveData?.loadMore()
+                            }
+                        }
+                    }
+
                 }
             })
         }
 
         private fun initialFillContinue(recyclerView: RecyclerView) {
 
-            // We are dont here, no more to fill
-            if (previousLastVisibleItemPos == Int.MAX_VALUE) return
-
-            val lastVisibleItemPos =
-                (recyclerView.layoutManager as LinearLayoutManager).findLastVisibleItemPosition()
+            val lm = (recyclerView.layoutManager as LinearLayoutManager)
+            val lastVisibleItemPos = lm.findLastVisibleItemPosition()
             logger.log(
                 TAG, "Initial Fill Across",
                 "last visible item pos: $lastVisibleItemPos, previously: $previousLastVisibleItemPos"
@@ -459,7 +502,7 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         }
 
         private fun canLoadMoreDescriptions(hasMore: Boolean, lastPos: Int, lastTimeVisibleItemPos: Int) =
-            hasMore && lastPos != lastTimeVisibleItemPos
+            hasMore && (lastPos != lastTimeVisibleItemPos)
     }
 
 

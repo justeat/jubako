@@ -15,6 +15,7 @@ import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.extensions.*
 import kotlinx.android.synthetic.main.activity_grid_fill.*
 import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
+import kotlinx.coroutines.delay
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -159,11 +160,11 @@ class GridFillActivity : AppCompatActivity() {
         val random = Random(SystemClock.uptimeMillis())
         fun getGridCell(offset: Int, crashRate: () -> Int): PaginatedLiveData<Boolean> {
             return PaginatedLiveData {
-                hasMore = { loaded.size < 100 }
+                hasMore = { loaded.size < 1000 }
                 nextPage = {
-                    if (random.nextInt(1..10) <= Math.min(crashRate(), 10)) {
-                        throw RuntimeException("Error")
-                    }
+//                    if (random.nextInt(1..10) <= Math.min(crashRate(), 10)) {
+//                        throw RuntimeException("Error")
+//                    }
                     listOf(((offset + loaded.size) % 2 == 0))
                 }
             }

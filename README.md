@@ -47,6 +47,7 @@ construction to support more complicated scenarios.**
 
 The best place to start right now with Jubako is to check it the examples in the `jubako-sample` app in this repository.
 
+**Documentation is rough right now so the best place to begin would be to run & study the examples https://github.com/justeat/jubako/tree/master/jubako-sample**
 ## Describing content
 For each row in Jubako is a `ContentDescription` that defines which view holder to use and which data to bind (in the form of `LiveData<T>`).
 

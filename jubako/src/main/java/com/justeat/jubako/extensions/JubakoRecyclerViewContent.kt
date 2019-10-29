@@ -1,7 +1,6 @@
 package com.justeat.jubako.extensions
 
 import android.content.Context
-import android.graphics.Rect
 import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
@@ -17,6 +16,8 @@ import com.justeat.jubako.R
 import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.data.PaginatedLiveData.State
 import com.justeat.jubako.data.ready
+import com.justeat.jubako.util.IJubakoScreenFiller
+import com.justeat.jubako.util.JubakoScreenFiller
 
 /**
  * Convenience function to add a [RecyclerView] into the list to present data as carousels, grids, etc,
@@ -261,7 +262,8 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         var itemData: (data: DATA, position: Int) -> ITEM_DATA,
         var itemCount: (data: DATA) -> Int,
         var paginatedLiveData: PaginatedLiveData<*>? = null,
-        val progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder
+        val progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder,
+        var screenFiller: IJubakoScreenFiller = IJubakoScreenFiller.NOOP
     ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
         companion object {
@@ -271,7 +273,6 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         private var progressPos: Int = 0
         private var currentState: State<*>? = paginatedLiveData?.value
 
-        var previousLastVisibleItemPos = Int.MIN_VALUE
         private var scrollListener: RecyclerView.OnScrollListener? = null
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -342,7 +343,7 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
                                         "item: $progressPos"
                                     )
                                     notifyItemRemoved(progressPos)
-                                    notifyAndContinue(state, recyclerView)
+                                    notifyAndContinue(state)
                                 }
                                 (previousState.ready() && !state.ready()) -> {
                                     progressPos = state.loaded.size
@@ -381,7 +382,7 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
                                 }
                                 else -> {
                                     logger.log(TAG, "Case 5", "")
-                                    notifyAndContinue(state, recyclerView)
+                                    notifyAndContinue(state)
                                 }
                             }
 
@@ -394,9 +395,7 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
             }
         }
 
-        var x = false
-
-        private fun notifyAndContinue(state: State<*>, recyclerView: RecyclerView) {
+        private fun notifyAndContinue(state: State<*>) {
             logger.log(TAG, "Carousel Page Loaded", "")
             val start = state.loaded.size - state.page.size
             logger.log(
@@ -405,7 +404,6 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
                 "start: $start, count: ${state.page.size}"
             )
             notifyItemRangeInserted(start, state.page.size)
-            initialFillContinue(recyclerView)
         }
 
         private fun setupLoadMoreScrollTrigger(recyclerView: RecyclerView) {
@@ -431,78 +429,17 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
 
         private fun initialFillBegin(recyclerView: RecyclerView) {
             logger.log(TAG, "Initial Fill Across", "begin...")
-            paginatedLiveData?.loadMore()
-            initialFillOnLayoutChanged(recyclerView)
-        }
-
-        private fun initialFillOnLayoutChanged(recyclerView: RecyclerView) {
-            recyclerView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
-                override fun onLayoutChange(
-                    v: View?,
-                    left: Int,
-                    top: Int,
-                    right: Int,
-                    bottom: Int,
-                    oldLeft: Int,
-                    oldTop: Int,
-                    oldRight: Int,
-                    oldBottom: Int
-                ) {
-                    logger.log(TAG, "Initial Fill Across", "On Layout")
-
-                    val dm = recyclerView.resources.displayMetrics
-                    val lm = (recyclerView.layoutManager as LinearLayoutManager)
-                    val lastVisibleItemPos = lm.findLastVisibleItemPosition()
-                    if (lastVisibleItemPos != RecyclerView.NO_POSITION) {
-                        val view = recyclerView.findViewHolderForAdapterPosition(lastVisibleItemPos)
-                        if (view != null) {
-                            val rect = Rect()
-                            view.itemView.getGlobalVisibleRect(rect)
-                            logger.log(
-                                TAG,
-                                "Initial Fill Across",
-                                "pos: $lastVisibleItemPos, right: $right, rect: $rect"
-                            )
-                            if (paginatedLiveData?.hasMore == false || rect.right >= right) {
-                                recyclerView.removeOnLayoutChangeListener(this)
-                            } else {
-                                paginatedLiveData?.loadMore()
-                            }
-                        }
+            paginatedLiveData?.apply {
+                loadMore()
+                screenFiller = JubakoScreenFiller(JubakoScreenFiller.Orientation.HORIZONTAL,
+                    logger, { hasMore }) {
+                    if (currentState?.error == null) {
+                        loadMore()
                     }
-
                 }
-            })
-        }
-
-        private fun initialFillContinue(recyclerView: RecyclerView) {
-
-            val lm = (recyclerView.layoutManager as LinearLayoutManager)
-            val lastVisibleItemPos = lm.findLastVisibleItemPosition()
-            logger.log(
-                TAG, "Initial Fill Across",
-                "last visible item pos: $lastVisibleItemPos, previously: $previousLastVisibleItemPos"
-            )
-
-            when {
-                canLoadMoreDescriptions(
-                    paginatedLiveData?.hasMore ?: false,
-                    lastVisibleItemPos,
-                    previousLastVisibleItemPos
-                ) -> {
-                    logger.log(TAG, "Initial Fill Across", "fill more...")
-                    previousLastVisibleItemPos = lastVisibleItemPos
-                    paginatedLiveData?.loadMore()
-                }
-                else -> {
-                    logger.log(TAG, "Initial Fill Across", "Complete")
-                    previousLastVisibleItemPos = Int.MAX_VALUE
-                }
+                screenFiller.attach(recyclerView)
             }
         }
-
-        private fun canLoadMoreDescriptions(hasMore: Boolean, lastPos: Int, lastTimeVisibleItemPos: Int) =
-            hasMore && (lastPos != lastTimeVisibleItemPos)
     }
 
 

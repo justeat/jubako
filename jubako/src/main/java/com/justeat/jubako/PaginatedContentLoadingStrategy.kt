@@ -33,9 +33,9 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         onLoaded: (hasMore: Boolean) -> Boolean
     ) {
         logger.log(TAG, "Load", "onReload: $reset, loading observers: ${loadingData.size}")
-        if (BuildConfig.DEBUG) {
-            TEMP_integrityCheck(data.source, data.destination)
-        }
+//        if (BuildConfig.DEBUG) {
+//            TEMP_integrityCheck(data.source, data.destination)
+//        }
 
         if (loadingData.size > 0) {
             logger.log(TAG, "Busy", "already loading")
@@ -52,7 +52,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         if (destination.size() > 0) {
             for (i in 0 until destination.size()) {
                 if (source[i] != destination[i]) {
-                    throw RuntimeException("Failed integrity check")
+                    throw RuntimeException("Failed integrity check, source size ${source.size}, dest size: ${destination.size()}, source: ${source[i]}, dest: ${destination[i]}")
                 }
             }
         }

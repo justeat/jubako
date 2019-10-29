@@ -1,6 +1,7 @@
 package com.justeat.jubako.widgets
 
 import android.content.Context
+import android.graphics.Canvas
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.ViewConfiguration
@@ -17,6 +18,8 @@ open class JubakoRecyclerView @JvmOverloads constructor(
     private var pointTouchX = 0
     private var pointTouchY = 0
     private var touchSlop = 0
+
+    var onDrawComplete: () -> Unit = {}
 
     init {
         touchSlop = ViewConfiguration.get(context).scaledTouchSlop
@@ -89,5 +92,18 @@ open class JubakoRecyclerView @JvmOverloads constructor(
                 return super.onInterceptTouchEvent(event)
             }
         }
+    }
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        super.onLayout(changed, l, t, r, b)
+    }
+
+    override fun onMeasure(widthSpec: Int, heightSpec: Int) {
+        super.onMeasure(widthSpec, heightSpec)
+        onDrawComplete()
+    }
+
+    override fun onDraw(c: Canvas?) {
+        super.onDraw(c)
     }
 }

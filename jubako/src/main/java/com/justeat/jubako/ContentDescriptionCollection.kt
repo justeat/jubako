@@ -6,7 +6,7 @@ package com.justeat.jubako
  */
 class ContentDescriptionCollection(var listener: Listener? = null) {
 
-    private val mContentDescriptions = mutableListOf<ContentDescription<*>>()
+    private var mContentDescriptions = mutableListOf<ContentDescription<*>>()
 
     interface Listener {
         fun notifyItemChanged(index: Int, payload: Any?)
@@ -31,6 +31,7 @@ class ContentDescriptionCollection(var listener: Listener? = null) {
     fun clear() {
         val size = mContentDescriptions.size
         mContentDescriptions.clear()
+        mContentDescriptions = mutableListOf()
         notifyItemRangeRemoved(0, size)
     }
 
@@ -38,7 +39,7 @@ class ContentDescriptionCollection(var listener: Listener? = null) {
      * Add a descriptionProvider to the end of this collection
      */
     fun add(block: ContentDescription<*>) {
-        mContentDescriptions.add(block)
+        mContentDescriptions = (mContentDescriptions + block).toMutableList()
         notifyItemInserted(mContentDescriptions.size - 1)
     }
 
@@ -50,7 +51,7 @@ class ContentDescriptionCollection(var listener: Listener? = null) {
 
         val positionStart = mContentDescriptions.size
         val itemCount = descriptions.size
-        mContentDescriptions.addAll(descriptions)
+        mContentDescriptions = (mContentDescriptions + descriptions).toMutableList()
 
         notifyItemRangeInserted(positionStart, itemCount)
     }

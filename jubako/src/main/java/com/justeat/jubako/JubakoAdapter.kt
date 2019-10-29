@@ -1,12 +1,13 @@
 package com.justeat.jubako
 
 import android.os.Handler
-import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.JubakoViewHolder.Event
+import com.justeat.jubako.util.IJubakoScreenFiller
+import com.justeat.jubako.util.JubakoScreenFiller
+import com.justeat.jubako.widgets.JubakoRecyclerView
 
 open class JubakoAdapter(
     private val lifecycleOwner: LifecycleOwner,
@@ -19,6 +20,9 @@ open class JubakoAdapter(
 
     private val handler = Handler()
     var logger = Jubako.logger
+    var hasMore: Boolean = true
+
+    var screenFiller = IJubakoScreenFiller.NOOP
 
     interface HolderFactory<T> {
         fun createViewHolder(parent: ViewGroup): JubakoViewHolder<T>
@@ -26,6 +30,7 @@ open class JubakoAdapter(
 
     override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         logger.log(TAG, "On Attach", "total rows: ${data.source.size}")
+        (recyclerView as JubakoRecyclerView).onDrawComplete = {}
         setupLoadMoreScrollTrigger(recyclerView)
         initialFillOnLayoutChanged(recyclerView)
         listenForContentChanges()
@@ -42,62 +47,19 @@ open class JubakoAdapter(
 
     private fun initialFillOnLayoutChanged(recyclerView: RecyclerView) {
         logger.log(TAG, "Initial Fill Down", "begin...")
-        initialFill(recyclerView)
-
-        //
-        // Initial loading the adapter performed on the first layout change to avoid inconsistency
-        // when an update occurs during a layout phase
-        //
-        recyclerView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
-            override fun onLayoutChange(
-                v: View?,
-                left: Int,
-                top: Int,
-                right: Int,
-                bottom: Int,
-                oldLeft: Int,
-                oldTop: Int,
-                oldRight: Int,
-                oldBottom: Int
-            ) {
-                recyclerView.removeOnLayoutChangeListener(this)
-                logger.log(TAG, "Initial Fill Down", "On Layout")
-
-                initialFill(recyclerView)
-            }
-        })
-    }
-
-    private fun initialFill(recyclerView: RecyclerView) {
-        var lastTimeVisibleItemPos = Int.MIN_VALUE
-
-        loadingStrategy.load(lifecycleOwner, data)
-
-        { hasMore ->
-            val lastPos =
-                (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
-            logger.log(
-                TAG,
-                "Initial Fill Down",
-                "last visible item pos: $lastPos, previously: $lastTimeVisibleItemPos"
-            )
-            when {
-                canLoadMoreDescriptions(hasMore, lastPos, lastTimeVisibleItemPos) -> {
-                    logger.log(TAG, "Initial Fill Down", "fill more...")
-                    lastTimeVisibleItemPos = lastPos
-                    true
-                }
-                else -> {
-                    logger.log(TAG, "Initial Fill Down", "Complete")
-                    onInitialFill()
-                    false
-                }
+        screenFiller = JubakoScreenFiller(JubakoScreenFiller.Orientation.VERTICAL, logger, { hasMore }) {
+            loadingStrategy.load(lifecycleOwner, data) {
+                hasMore = it
+                false
             }
         }
-    }
+        screenFiller.attach(recyclerView)
+        loadingStrategy.load(lifecycleOwner, data) {
+            hasMore = it
+            false
+        }
 
-    private fun canLoadMoreDescriptions(hasMore: Boolean, lastPos: Int, lastTimeVisibleItemPos: Int) =
-        hasMore && lastPos != lastTimeVisibleItemPos
+    }
 
     override fun getItemCount(): Int {
         return data.numItemsLoaded()
@@ -105,7 +67,7 @@ open class JubakoAdapter(
 
     override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): JubakoViewHolder<Any> {
 
-        val factory = data.viewHolderFactories.get(viewType)
+        val factory = data.viewHolderFactories[viewType]
 
         val holder = factory.createViewHolder(viewGroup)
         holder.logger = logger

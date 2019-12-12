@@ -47,7 +47,7 @@ open class JubakoAdapter(
 
     private fun initialFillOnLayoutChanged(recyclerView: RecyclerView) {
         logger.log(TAG, "Initial Fill Down", "begin...")
-        screenFiller = JubakoScreenFiller(JubakoScreenFiller.Orientation.VERTICAL, logger, { hasMore }) {
+        screenFiller = JubakoScreenFiller(JubakoScreenFiller.Orientation.VERTICAL, logger, false, { hasMore }) {
             loadingStrategy.load(lifecycleOwner, data) {
                 hasMore = it
                 false
@@ -56,6 +56,7 @@ open class JubakoAdapter(
         screenFiller.attach(recyclerView)
         loadingStrategy.load(lifecycleOwner, data) {
             hasMore = it
+            onInitialFill()
             false
         }
 

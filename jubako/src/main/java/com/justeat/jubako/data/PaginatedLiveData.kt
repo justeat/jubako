@@ -48,7 +48,13 @@ class PaginatedLiveData<T>(private val paging: Pager<T>.() -> Unit) : LiveData<P
         }
     }
 
+    val EMPTY_STATE = State<T>(listOf(), listOf(), false, null, false)
+    var state: State<T> = EMPTY_STATE
+    var previousState: State<T> = EMPTY_STATE
+
     fun loadMore() {
+        if(state.loaded.isNotEmpty() && !state.accepted) return
+
         if (loadingJob != null && loadingJob?.isCompleted == false) {
             Jubako.logger.log(TAG, "Busy", "already loading")
             return
@@ -57,8 +63,8 @@ class PaginatedLiveData<T>(private val paging: Pager<T>.() -> Unit) : LiveData<P
         if (pager.hasMore()) {
             Jubako.logger.log(TAG, "Loading More")
             paging(pager)
-
-            value = State(loaded = loaded, page = emptyList(), loading = true)
+            previousState = state
+            state = State(loaded = loaded, page = emptyList(), loading = true).apply { value = this }
 
             loadingJob = launch(io) {
                 try {
@@ -67,17 +73,24 @@ class PaginatedLiveData<T>(private val paging: Pager<T>.() -> Unit) : LiveData<P
                     Jubako.logger.log(TAG, "Page Loaded", "size: ${page.size}, total:${loaded.size}")
                     launch(Dispatchers.Main) {
                         loadingJob = null
-                        value = State(loaded = loaded, page = page)
+                        previousState = state
+                        state = State(loaded = loaded, page = page).apply { value = this }
                     }
                 } catch (error: Throwable) {
                     Jubako.logger.log(TAG, "Page Error", "${Log.getStackTraceString(error)}")
                     launch(Dispatchers.Main) {
                         loadingJob = null
-                        value = State(loaded = loaded, page = emptyList(), error = error)
+                        previousState = state
+                        state = State(loaded = loaded, page = emptyList(), error = error).apply { value = this }
                     }
                 }
             }
         }
+    }
+
+    override fun onInactive() {
+        super.onInactive()
+        previousState = EMPTY_STATE
     }
 
     class Pager<T>(private val _loaded: () -> List<T>) {

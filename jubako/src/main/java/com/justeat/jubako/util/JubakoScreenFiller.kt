@@ -6,9 +6,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.widgets.JubakoRecyclerView
 
+
 open class JubakoScreenFiller(
     val orientation: Orientation,
     val logger: Jubako.Logger,
+    val log: Boolean = true,
     val hasMore: () -> Boolean,
     val loadMore: () -> Unit
 ) : IJubakoScreenFiller {
@@ -20,54 +22,64 @@ open class JubakoScreenFiller(
 
     override fun attach(recyclerView: RecyclerView) {
         (recyclerView as JubakoRecyclerView).onDrawComplete = {
-            val lm = (recyclerView.layoutManager as LinearLayoutManager)
-            val lastVisibleItemPos = lm.findLastVisibleItemPosition()
-            logger.log(TAG, "Recycler child count: ${recyclerView.childCount}")
-            logger.log(TAG, "Initial Fill $orientation", "On Draw (lastVisibleItemPos: $lastVisibleItemPos)")
-            if (lastVisibleItemPos != RecyclerView.NO_POSITION) {
-                val view = lm.findViewByPosition(lastVisibleItemPos)
-                if (view != null) {
-                    val rect = Rect()
-                    view.getLocalVisibleRect(rect)
+            if (hasMore()) {
+                val lm = (recyclerView.layoutManager as LinearLayoutManager)
+                val lastVisibleItemPos = lm.findLastVisibleItemPosition()
+                if (lastVisibleItemPos != RecyclerView.NO_POSITION) {
+                    val view = lm.findViewByPosition(lastVisibleItemPos)
+                    if (view == null && log) logger.log(TAG, "$lastVisibleItemPos view was null")
+                    if (view != null) {
+                        val itemRect = Rect()
+                        val areaRect = Rect()
+                        recyclerView.getGlobalVisibleRect(areaRect)
+                        itemRect.left = lm.getDecoratedLeft(view)
+                        itemRect.right = lm.getDecoratedRight(view)
+                        itemRect.top = lm.getDecoratedTop(view)
+                        itemRect.bottom = lm.getDecoratedBottom(view)
 
-                    val filled = when (orientation) {
-                        Orientation.HORIZONTAL -> {
-                            rect.right >= recyclerView.measuredWidth
+                        val areaWidth = areaRect.width()
+                        val areaHeight = areaRect.height()
+
+                        val filled = when (orientation) {
+                            Orientation.HORIZONTAL -> {
+                                itemRect.right > areaWidth
+                            }
+                            else -> {
+                                itemRect.bottom > areaHeight
+                            }
                         }
-                        else -> {
-                            rect.bottom >= recyclerView.measuredHeight
+
+                        val extent = when (orientation) {
+                            Orientation.HORIZONTAL -> {
+                                areaWidth
+                            }
+                            else -> {
+                                areaHeight
+                            }
+                        }
+
+                        if (filled) {
+                            if (log) logger.log(
+                                TAG,
+                                "Fill $orientation Complete",
+                                "pos: $lastVisibleItemPos, extent: $extent, rect: $itemRect"
+                            )
+                        } else if (hasMore()) {
+                            if (log) logger.log(
+                                TAG,
+                                "Fill $orientation  Filling",
+                                "pos: $lastVisibleItemPos, extent: $extent, rect: $itemRect"
+                            )
+                            loadMore()
                         }
                     }
-
-                    val extent = when (orientation) {
-                        Orientation.HORIZONTAL -> {
-                            recyclerView.measuredWidth
-                        }
-                        else -> {
-                            recyclerView.measuredHeight
-                        }
-                    }
-
-                    val hasMore = hasMore()
-                    if (!hasMore || filled) {
-                        logger.log(
-                            TAG,
-                            "Initial Fill $orientation",
-                            "Complete pos: $lastVisibleItemPos, extent: $extent, rect: $rect, hasMore: $hasMore"
-                        )
-                    } else {
-                        logger.log(
-                            TAG,
-                            "Initial Fill $orientation",
-                            "pos: $lastVisibleItemPos, extent: $extent, rect: $rect"
-                        )
-                        loadMore()
-                    }
-                } else {
-                    loadMore()
                 }
             } else {
-                loadMore()
+                if (log) logger.log(
+                    TAG,
+                    "Initial Fill $orientation",
+                    "Nothing more to load"
+                )
             }
         }
     }

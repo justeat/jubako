@@ -7,17 +7,26 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.CallSuper
 import androidx.annotation.IdRes
-import androidx.lifecycle.*
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.OnLifecycleEvent
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
-import com.justeat.jubako.*
+import com.justeat.jubako.ContentDescription
+import com.justeat.jubako.Jubako
+import com.justeat.jubako.JubakoViewHolder
 import com.justeat.jubako.R
 import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.data.PaginatedLiveData.State
 import com.justeat.jubako.data.ready
+import com.justeat.jubako.descriptionProvider
 import com.justeat.jubako.util.IJubakoScreenFiller
 import com.justeat.jubako.util.JubakoScreenFiller
+import com.justeat.jubako.viewHolderFactory
 
 /**
  * Convenience function to add a [RecyclerView] into the list to present data as carousels, grids, etc,
@@ -194,7 +203,9 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
     override fun bind(data: DATA?) {
         viewBinder(this)
         data?.apply {
-            recycler.adapter = createAdapter(data)
+            if(recycler.adapter == null) {
+                recycler.adapter = createAdapter(data)
+            }
             trackState()
         }
     }
@@ -271,8 +282,6 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         }
 
         private var progressPos: Int = 0
-        private var currentState: State<*>? = paginatedLiveData?.value
-
         private var scrollListener: RecyclerView.OnScrollListener? = null
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -285,13 +294,13 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         }
 
         override fun getItemCount(): Int {
-            return currentState?.let { state ->
+            return paginatedLiveData?.state?.let { state ->
                 itemCount(state as DATA) + (if (state.loading || state.error != null) 1 else 0)
             } ?: itemCount(data)
         }
 
         override fun getItemViewType(position: Int): Int {
-            return currentState?.let { state ->
+            return paginatedLiveData?.state?.let { state ->
                 return if ((state.loading || state.error != null) && position == state.loaded.size) {
                     VIEW_TYPE_PROGRESS
                 } else {
@@ -301,7 +310,7 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         }
 
         override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            currentState?.let { state ->
+            paginatedLiveData?.state?.let { state ->
                 when {
                     state.loading && position == state.loaded.size -> {
                         logger.log(TAG, "Bind View Holder (progress)", "position: $position")
@@ -325,73 +334,58 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
 
         override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
             super.onAttachedToRecyclerView(recyclerView)
-            setupPaginatedLoading(recyclerView)
+            if (paginatedLiveData != null) {
+                setupPaginatedLoading(recyclerView)
+            }
         }
 
         private fun setupPaginatedLoading(recyclerView: RecyclerView) {
-            if (paginatedLiveData != null) {
-                lifecycleOwner?.let {
-                    paginatedLiveData?.observe(it, Observer<State<*>> { state ->
-                        logger.log(TAG, "Observe State", "$state")
-                        if (state!!.accept()) {
-                            val previousState = currentState
-                            when {
-                                (!previousState.ready() && state.ready()) -> {
-                                    logger.log(
-                                        TAG,
-                                        "Notify Item Removed (progress)",
-                                        "item: $progressPos"
-                                    )
-                                    notifyItemRemoved(progressPos)
-                                    notifyAndContinue(state)
-                                }
-                                (previousState.ready() && !state.ready()) -> {
-                                    progressPos = state.loaded.size
-                                    logger.log(
-                                        TAG,
-                                        "Notify Item Inserted (progress)",
-                                        "item: $progressPos"
-                                    )
-                                    notifyItemInserted(progressPos)
-                                }
-                                state.error != null -> {
-                                    logger.log(
-                                        TAG,
-                                        "Notify Item Changed (error)",
-                                        "item: $progressPos"
-                                    )
-                                    notifyItemChanged(progressPos)
-                                }
-                                state.loading -> {
-                                    if (previousState == null) {
-                                        progressPos = state.loaded.size
-                                        logger.log(
-                                            TAG,
-                                            "Notify Item Inserted (loading)",
-                                            "item: $progressPos"
-                                        )
-                                        notifyItemInserted(progressPos)
-                                    } else {
-                                        logger.log(
-                                            TAG,
-                                            "Notify Item Changed (loading)",
-                                            "item: $progressPos"
-                                        )
-                                        notifyItemChanged(progressPos)
-                                    }
-                                }
-                                else -> {
-                                    logger.log(TAG, "Case 5", "")
-                                    notifyAndContinue(state)
-                                }
-                            }
+            lifecycleOwner?.let {
+                paginatedLiveData?.observe(it, Observer<State<*>> { state ->
+                    logger.log(TAG, "Observe State", "$state")
+                    consumeState(state)
+                })
+            }
+            setupLoadMoreScrollTrigger(recyclerView)
+            initialFillBegin(recyclerView)
+        }
 
-                            currentState = state
-                        }
-                    })
+        private fun consumeState(state: State<*>) {
+            if (state.accept()) {
+                val previousState = paginatedLiveData!!.previousState
+                when {
+                    state.error != null -> {
+                        logger.log(
+                            TAG,
+                            "Notify Item Changed (error)",
+                            "position: $progressPos"
+                        )
+                        notifyItemChanged(progressPos)
+                    }
+                    (!previousState.ready() && state.ready()) -> {
+                        progressPos = previousState.loaded.size
+                        logger.log(
+                            TAG,
+                            "Notify Item Removed (progress)",
+                            "position: $progressPos"
+                        )
+                        notifyItemRemoved(progressPos)
+                        notifyAndContinue(state)
+                    }
+                    (previousState.ready() && !state.ready()) -> {
+                        progressPos = state.loaded.size
+                        logger.log(
+                            TAG,
+                            "Notify Item Inserted (progress)",
+                            "item: $progressPos"
+                        )
+                        notifyItemInserted(progressPos)
+                    }
+                    else -> {
+                        logger.log(TAG, "Case 5", "")
+                        notifyAndContinue(state)
+                    }
                 }
-                setupLoadMoreScrollTrigger(recyclerView)
-                initialFillBegin(recyclerView)
             }
         }
 
@@ -419,7 +413,11 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
                         recyclerView.computeHorizontalScrollRange() - recyclerView.computeHorizontalScrollExtent()
                     if (range != 0 && offset > range * 0.8f) {
                         logger.log(TAG, "Scroll Trigger Load", "")
-                        paginatedLiveData?.loadMore()
+                        paginatedLiveData?.apply {
+                            if (state.error == null && !state.loading) {
+                                loadMore()
+                            }
+                        }
                     }
                 }
             }
@@ -430,10 +428,12 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
         private fun initialFillBegin(recyclerView: RecyclerView) {
             logger.log(TAG, "Initial Fill Across", "begin...")
             paginatedLiveData?.apply {
-                loadMore()
+                if (state.error == null) {
+                    loadMore()
+                }
                 screenFiller = JubakoScreenFiller(JubakoScreenFiller.Orientation.HORIZONTAL,
-                    logger, { hasMore }) {
-                    if (currentState?.error == null) {
+                    logger, true, { hasMore }) {
+                    if (state.error == null) {
                         loadMore()
                     }
                 }

@@ -175,15 +175,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         Cancellable {
         override var cancelled = false
         override fun onChanged(data: Any?) {
-            if (data is PaginatedLiveData.State<*>) {
-                logger.log(TAG, "Accept Live Data Page", "$currentDescription")
-                data.accept()
-                if (!data.loading) {
-                    proceed()
-                }
-            } else {
-                proceed()
-            }
+            proceed()
         }
 
         private fun proceed() {

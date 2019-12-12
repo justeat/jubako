@@ -15,6 +15,8 @@ import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.extensions.*
 import kotlinx.android.synthetic.main.activity_grid_fill.*
 import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
+import kotlinx.coroutines.delay
+import kotlin.math.min
 import kotlin.random.Random
 import kotlin.random.nextInt
 
@@ -30,7 +32,7 @@ class GridFillActivity : AppCompatActivity() {
 
         Jubako.logger = Jubako.Logger(BuildConfig.DEBUG)
 
-        jubako = recyclerView.withJubako(this, pageSize(1))
+        jubako = recyclerView.withJubako(this, pageSize(PAGE_SIZE))
 
         load()
     }
@@ -40,7 +42,7 @@ class GridFillActivity : AppCompatActivity() {
         val tileSize = { (tileSize.selectedItem as String).toInt() }
 
         jubako.load {
-            (0 until 100).forEach { index ->
+            (0 until NUM_ROWS).forEach { index ->
                 addRecyclerView(
                     //
                     // Inflate a view for our carousel
@@ -113,7 +115,7 @@ class GridFillActivity : AppCompatActivity() {
         }
 
         tileSize.adapter = adapter
-        tileSize.setSelection(3)
+        tileSize.setSelection(7)
     }
 
     //
@@ -158,14 +160,22 @@ class GridFillActivity : AppCompatActivity() {
         val random = Random(SystemClock.uptimeMillis())
         fun getGridCell(offset: Int, crashRate: () -> Int): PaginatedLiveData<Boolean> {
             return PaginatedLiveData {
-                hasMore = { loaded.size < 100 }
+                hasMore = { loaded.size < NUM_COLUMNS }
                 nextPage = {
-                    if (random.nextInt(1..10) <= Math.min(crashRate(), 10)) {
-                        throw RuntimeException("Error")
-                    }
+                    throwRandomError(crashRate)
                     listOf(((offset + loaded.size) % 2 == 0))
                 }
             }
         }
+
+        private fun throwRandomError(crashRate: () -> Int) {
+            if (random.nextInt(1..10) <= min(crashRate(), 10)) {
+                throw RuntimeException("Error")
+            }
+        }
     }
 }
+
+private const val PAGE_SIZE = 1
+private const val NUM_ROWS = 100
+private const val NUM_COLUMNS = 100

@@ -12,7 +12,8 @@ open class JubakoScreenFiller(
     val logger: Jubako.Logger,
     val log: Boolean = true,
     val hasMore: () -> Boolean,
-    val loadMore: () -> Unit
+    val loadMore: () -> Unit,
+    val onFilled: () -> Unit = {}
 ) : IJubakoScreenFiller {
 
     enum class Orientation {
@@ -64,6 +65,7 @@ open class JubakoScreenFiller(
                                 "Fill $orientation Complete",
                                 "pos: $lastVisibleItemPos, extent: $extent, rect: $itemRect"
                             )
+                            onFilled()
                         } else if (hasMore()) {
                             if (log) logger.log(
                                 TAG,

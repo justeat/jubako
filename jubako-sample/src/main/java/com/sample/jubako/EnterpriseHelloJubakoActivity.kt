@@ -57,7 +57,7 @@ class EnterpriseHelloJubakoActivity : AppCompatActivity() {
     }
 
     class HelloJubakoAssembler : SimpleJubakoAssembler() {
-        override fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {
+        override suspend fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {
             if (randomTime() > FAILURE_THRESHOLD_MS) {
                 throw Error("Something went wrong")
             }

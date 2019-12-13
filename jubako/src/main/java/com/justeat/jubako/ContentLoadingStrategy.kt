@@ -9,7 +9,8 @@ interface ContentLoadingStrategy {
     fun load(
         lifecycleOwner: LifecycleOwner,
         data: Jubako.Data,
-        onLoaded: (loadMore: Boolean) -> Boolean = { false }
+        onLoaded: (hasMore: Boolean) -> Boolean = { false },
+        onError: (error: Throwable) -> Unit = {}
     )
 
     fun reload(lifecycleOwner: LifecycleOwner, position: Int, descriptions: ContentDescriptionCollection)

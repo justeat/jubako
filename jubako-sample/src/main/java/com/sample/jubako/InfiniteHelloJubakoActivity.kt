@@ -33,7 +33,7 @@ class InfiniteHelloJubakoActivity : AppCompatActivity() {
         //
         override fun hasMore() = true
 
-        override fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {
+        override suspend fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {
             // pages of ten
             for (i in 0 until 10) {
                 val num = ++counter

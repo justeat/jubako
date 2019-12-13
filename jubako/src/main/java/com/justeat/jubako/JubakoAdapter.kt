@@ -2,6 +2,7 @@ package com.justeat.jubako
 
 import android.os.Handler
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.JubakoViewHolder.Event
@@ -47,19 +48,33 @@ open class JubakoAdapter(
 
     private fun initialFillOnLayoutChanged(recyclerView: RecyclerView) {
         logger.log(TAG, "Initial Fill Down", "begin...")
-        screenFiller = JubakoScreenFiller(JubakoScreenFiller.Orientation.VERTICAL, logger, false, { hasMore }) {
-            loadingStrategy.load(lifecycleOwner, data) {
-                hasMore = it
-                false
+        screenFiller = JubakoScreenFiller(
+            orientation = JubakoScreenFiller.Orientation.VERTICAL,
+            logger = logger,
+            log = true,
+            hasMore = { hasMore },
+            loadMore = this::load,
+            onFilled = {
+                onInitialFill()
             }
-        }
+        )
         screenFiller.attach(recyclerView)
-        loadingStrategy.load(lifecycleOwner, data) {
-            hasMore = it
-            onInitialFill()
-            false
-        }
+        load()
+    }
 
+    private var inLoadingError = false
+
+    private fun load() {
+        if(!inLoadingError) {
+            loadingStrategy.load(lifecycleOwner, data,
+                onLoaded = {
+                    hasMore = it
+                    false
+                },
+                onError = {
+                    inLoadingError = true
+                })
+        }
     }
 
     override fun getItemCount(): Int {
@@ -140,10 +155,10 @@ open class JubakoAdapter(
                 val range = recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent()
                 if (range != 0 && offset > range * 0.8f) {
                     logger.log(TAG, "Scroll Trigger Load")
-                    loadingStrategy.load(lifecycleOwner, data) {
+                    loadingStrategy.load(lifecycleOwner, data, onLoaded = {
                         logger.log(TAG, "Scroll Trigger Load Complete")
                         false
-                    }
+                    })
                 }
             }
         }

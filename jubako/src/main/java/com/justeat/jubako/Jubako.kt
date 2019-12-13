@@ -55,7 +55,7 @@ open class Jubako : ViewModel(), CoroutineScope {
                     load(assembler)
                     liveData.postValue(State.Assembled(this@Data))
                 } catch (exception: Throwable) {
-                    logger.log("Assemble Error", "${Log.getStackTraceString(exception)}")
+                    logger.log("Assemble Error", Log.getStackTraceString(exception))
                     liveData.postValue(State.AssembleError(exception))
                 }
             }
@@ -94,7 +94,7 @@ open class Jubako : ViewModel(), CoroutineScope {
                     )
                 )
             } catch (exception: Throwable) {
-                logger.log("Assemble Error", "${Log.getStackTraceString(exception)}")
+                logger.log(logger.tag,"Assemble Error", "${Log.getStackTraceString(exception)}")
                 loadingState.postValue(State.AssembleError(exception))
             } finally {
                 loadingJob = null

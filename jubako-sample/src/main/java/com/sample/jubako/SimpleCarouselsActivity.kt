@@ -39,7 +39,7 @@ class SimpleCarouselsActivity : AppCompatActivity() {
                     //
                     // Provide a lambda that will create our carousel item view holder
                     //
-                    itemViewHolder = { inflater, parent ->
+                    itemViewHolder = { inflater, parent, _ ->
                         SimpleCarouselItemViewHolder(inflater, parent)
                     },
                     //

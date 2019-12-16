@@ -29,7 +29,7 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
 
     @IdRes
     internal var recyclerViewId: Int = View.NO_ID
-    internal lateinit var itemViewHolder: (layoutInflater: LayoutInflater, parent: ViewGroup) -> ITEM_HOLDER
+    internal lateinit var itemViewHolder: (layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int) -> ITEM_HOLDER
     internal var viewBinder: (Any) -> Unit = {}
     internal var itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> }
     internal var lifecycleOwner: LifecycleOwner? = null

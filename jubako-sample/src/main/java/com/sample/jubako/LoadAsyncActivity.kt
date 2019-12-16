@@ -77,7 +77,7 @@ class LoadAsyncActivity : AppCompatActivity() {
                         //
                         // A factory to produce item view holders
                         //
-                        itemViewHolder = { inflater, parent ->
+                        itemViewHolder = { inflater, parent, _ ->
                             SimpleCarouselItemViewHolder(inflater, parent)
                         },
                         //

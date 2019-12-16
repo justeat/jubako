@@ -124,10 +124,6 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
                     )
                     notifyItemInserted(progressPos)
                 }
-                else -> {
-//                    logger.log(TAG, "Case 5", "")
-//                    notifyAndContinue(state)
-                }
             }
         }
     }

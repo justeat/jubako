@@ -69,7 +69,7 @@ class MoviesActivity : AppCompatActivity() {
                         data = InstantLiveData(group),
                         itemData = { data, position -> data.movies[position] },
                         itemCount = { data -> data.movies.size },
-                        itemViewHolder = { inflater, parent ->
+                        itemViewHolder = { inflater, parent, _ ->
                             MovieItemViewHolder(inflater, parent)
                         },
                         itemBinder = { holder, data -> holder.bind(data) }

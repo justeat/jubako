@@ -91,6 +91,11 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
 
     fun onStateChanged(state: PaginatedDataState<*>, previousState: PaginatedDataState<*>) {
         if (state.accept()) {
+            logger.log(
+                TAG,
+                "State Change",
+                "state: $state"
+            )
             when {
                 state.error != null -> {
                     logger.log(
@@ -120,8 +125,8 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
                     notifyItemInserted(progressPos)
                 }
                 else -> {
-                    logger.log(TAG, "Case 5", "")
-                    notifyAndContinue(state)
+//                    logger.log(TAG, "Case 5", "")
+//                    notifyAndContinue(state)
                 }
             }
         }

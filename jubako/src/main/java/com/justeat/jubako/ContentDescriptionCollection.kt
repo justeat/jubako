@@ -36,14 +36,6 @@ class ContentDescriptionCollection(var listener: Listener? = null) {
     }
 
     /**
-     * Add a descriptionProvider to the end of this collection
-     */
-    fun add(block: ContentDescription<*>) {
-        mContentDescriptions = (mContentDescriptions + block).toMutableList()
-        notifyItemInserted(mContentDescriptions.size - 1)
-    }
-
-    /**
      * Add many descriptions to the end of this collection
      */
     fun addAll(descriptions: List<ContentDescription<*>>) {

@@ -16,9 +16,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.adapters.JubakoRecyclerViewHolder
 import com.justeat.jubako.data.InstantLiveData
-import com.justeat.jubako.extensions.*
+import com.justeat.jubako.extensions.addRecyclerView
+import com.justeat.jubako.extensions.addView
+import com.justeat.jubako.extensions.loadAsync
+import com.justeat.jubako.extensions.withJubako
 import com.squareup.picasso.Picasso
-import kotlinx.android.synthetic.main.activity_jubako_recycler.*
+import kotlinx.android.synthetic.main.activity_jubako_recycler.loadingIndicator
+import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 import kotlin.random.Random
 
 class MoviesActivity : AppCompatActivity() {
@@ -65,7 +69,9 @@ class MoviesActivity : AppCompatActivity() {
                         data = InstantLiveData(group),
                         itemData = { data, position -> data.movies[position] },
                         itemCount = { data -> data.movies.size },
-                        itemViewHolder = { MovieItemViewHolder(it) },
+                        itemViewHolder = { inflater, parent ->
+                            MovieItemViewHolder(inflater, parent)
+                        },
                         itemBinder = { holder, data -> holder.bind(data) }
                     )
                 }
@@ -83,8 +89,8 @@ class MoviesActivity : AppCompatActivity() {
         recyclerView.isGone = true
     }
 
-    class MovieItemViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(
+    class MovieItemViewHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(
+        inflater.inflate(
             R.layout.carousel_item_movie,
             parent,
             false

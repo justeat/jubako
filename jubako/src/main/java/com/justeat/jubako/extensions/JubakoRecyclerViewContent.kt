@@ -1,6 +1,7 @@
 package com.justeat.jubako.extensions
 
 import android.content.Context
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.IdRes
@@ -15,6 +16,8 @@ import com.justeat.jubako.adapters.JubakoRecyclerViewHolder
 import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.descriptionProvider
 import com.justeat.jubako.viewHolderFactory
+
+typealias CreateViewDelegate = ((layoutInflater: LayoutInflater, parent: ViewGroup) -> View)
 
 /**
  * Convenience function to add a [RecyclerView] into the list to present data as carousels, grids, etc,
@@ -46,14 +49,14 @@ import com.justeat.jubako.viewHolderFactory
  */
 fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM_DATA, ITEM_HOLDER :
 RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
-    view: ((parent: ViewGroup) -> View)? = null,
+    view: CreateViewDelegate? = null,
     viewHolder: (parent: ViewGroup) -> HOLDER = defaultRecyclerViewHolder(view),
     @IdRes recyclerViewId: Int = View.NO_ID,
     viewBinder: (holder: HOLDER) -> Unit = {},
     data: LiveData<DATA>,
     itemData: (data: DATA, position: Int) -> ITEM_DATA,
     itemCount: (data: DATA) -> Int,
-    itemViewHolder: (parent: ViewGroup) -> ITEM_HOLDER,
+    itemViewHolder: (layoutInflater: LayoutInflater, parent: ViewGroup) -> ITEM_HOLDER,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
     layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
     onReload: (ContentDescription<DATA>.(payload: Any?) -> Unit) = {},
@@ -107,14 +110,14 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
  * @param ITEM_HOLDER A standard implementation of [RecyclerView.ViewHolder] to display [ITEM_DATA]
  */
 fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder> recyclerViewContent(
-    view: ((parent: ViewGroup) -> View)? = null,
+    view: CreateViewDelegate? = null,
     viewHolder: (parent: ViewGroup) -> HOLDER = defaultRecyclerViewHolder(view),
     @IdRes recyclerViewId: Int = View.NO_ID,
     viewBinder: (holder: HOLDER) -> Unit = {},
     data: LiveData<DATA>,
     itemData: (data: DATA, position: Int) -> ITEM_DATA,
     itemCount: (data: DATA) -> Int,
-    itemViewHolder: (parent: ViewGroup) -> ITEM_HOLDER,
+    itemViewHolder: (layoutInflater: LayoutInflater, parent: ViewGroup) -> ITEM_HOLDER,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
     layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
     onReload: (ContentDescription<DATA>.(payload: Any?) -> Unit) = {},
@@ -144,12 +147,12 @@ fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM
 }
 
 internal fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder> defaultRecyclerViewHolder(
-    view: ((parent: ViewGroup) -> View)?
+    view: CreateViewDelegate?
 ): (ViewGroup) -> HOLDER {
     return {
         @Suppress("UNCHECKED_CAST")
         JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>(
-            view?.invoke(it) ?: throw Error("view is required with default viewHolder")
+            view?.invoke(LayoutInflater.from(it.context), it) ?: throw Error("view is required with default viewHolder")
         ) as HOLDER
     }
 }

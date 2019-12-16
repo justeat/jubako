@@ -66,6 +66,8 @@ open class JubakoScreenFiller(
                                 "pos: $lastVisibleItemPos, extent: $extent, rect: $itemRect"
                             )
                             onFilled()
+                            // We are done no need to remain attached
+                            recyclerView.onDrawComplete = {}
                         } else if (hasMore()) {
                             if (log) logger.log(
                                 TAG,

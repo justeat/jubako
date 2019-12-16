@@ -11,8 +11,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.adapters.JubakoRecyclerViewHolder
 import com.justeat.jubako.data.InstantLiveData
-import com.justeat.jubako.extensions.*
-import kotlinx.android.synthetic.main.activity_jubako_recycler.*
+import com.justeat.jubako.extensions.addRecyclerView
+import com.justeat.jubako.extensions.loadAsync
+import com.justeat.jubako.extensions.withJubako
+import kotlinx.android.synthetic.main.activity_jubako_recycler.loadingIndicator
+import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 
 class LoadAsyncActivity : AppCompatActivity() {
 
@@ -74,7 +77,9 @@ class LoadAsyncActivity : AppCompatActivity() {
                         //
                         // A factory to produce item view holders
                         //
-                        itemViewHolder = { SimpleCarouselItemViewHolder(it) },
+                        itemViewHolder = { inflater, parent ->
+                            SimpleCarouselItemViewHolder(inflater, parent)
+                        },
                         //
                         // Perform binding of the item data to the holder
                         //
@@ -94,8 +99,8 @@ class LoadAsyncActivity : AppCompatActivity() {
         recyclerView.isGone = true
     }
 
-    class SimpleCarouselItemViewHolder(parent: ViewGroup) : RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(
+    class SimpleCarouselItemViewHolder(inflater: LayoutInflater, parent: ViewGroup) : RecyclerView.ViewHolder(
+        inflater.inflate(
             R.layout.simple_carousel_item_text,
             parent,
             false

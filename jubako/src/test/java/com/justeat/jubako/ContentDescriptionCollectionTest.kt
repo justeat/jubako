@@ -25,25 +25,4 @@ class ContentDescriptionCollectionTest {
 
         assertEquals(3, collection.size())
     }
-
-    @Test
-    @Throws(Exception::class)
-    fun addPersistsEntries() {
-        val collection = ContentDescriptionCollection()
-
-        collection.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
-            override fun createViewHolder(parent: ViewGroup): JubakoViewHolder<String> = null!!
-        }))
-        collection.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
-            override fun createViewHolder(parent: ViewGroup): JubakoViewHolder<String> = null!!
-        }))
-        collection.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
-            override fun createViewHolder(parent: ViewGroup): JubakoViewHolder<String> = null!!
-        }))
-        collection.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
-            override fun createViewHolder(parent: ViewGroup): JubakoViewHolder<String> = null!!
-        }))
-
-        assertEquals(4, collection.size())
-    }
 }

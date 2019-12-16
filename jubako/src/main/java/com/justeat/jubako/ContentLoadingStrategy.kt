@@ -10,7 +10,7 @@ interface ContentLoadingStrategy {
     fun load(
         lifecycleOwner: LifecycleOwner,
         data: Jubako.Data,
-        callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Boolean
+        callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Unit
     )
 
     fun reload(lifecycleOwner: LifecycleOwner, position: Int, descriptions: ContentDescriptionCollection)

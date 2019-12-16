@@ -12,7 +12,7 @@ import com.justeat.jubako.extensions.addRecyclerView
 import com.justeat.jubako.extensions.load
 import com.justeat.jubako.extensions.pageSize
 import com.justeat.jubako.extensions.withJubako
-import kotlinx.android.synthetic.main.activity_jubako_recycler.*
+import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -33,13 +33,15 @@ class SimpleCarouselsActivity : AppCompatActivity() {
                     //
                     // Inflate a view for our carousel
                     //
-                    view = {
-                        LayoutInflater.from(this@SimpleCarouselsActivity).inflate(R.layout.simple_carousel, it, false)
+                    view = { inflater, parent ->
+                        inflater.inflate(R.layout.simple_carousel, parent, false)
                     },
                     //
                     // Provide a lambda that will create our carousel item view holder
                     //
-                    itemViewHolder = { SimpleCarouselItemViewHolder(it) },
+                    itemViewHolder = { inflater, parent ->
+                        SimpleCarouselItemViewHolder(inflater, parent)
+                    },
                     //
                     // Specify the data that will be loaded into the carousel
                     //
@@ -66,8 +68,8 @@ class SimpleCarouselsActivity : AppCompatActivity() {
         }
     }
 
-    inner class SimpleCarouselItemViewHolder(parent: ViewGroup) :
-        RecyclerView.ViewHolder(LayoutInflater.from(this).inflate(R.layout.simple_carousel_item_text, parent, false))
+    inner class SimpleCarouselItemViewHolder(inflater: LayoutInflater, parent: ViewGroup) :
+        RecyclerView.ViewHolder(inflater.inflate(R.layout.simple_carousel_item_text, parent, false))
 
     companion object {
         fun getNumbersEnglish(): LiveData<List<String>> {

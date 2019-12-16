@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.ContentDescriptionProvider
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.SimpleJubakoAssembler
-import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.adapters.ProgressView
+import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.extensions.addRecyclerView
 import com.justeat.jubako.extensions.pageSize
 import com.justeat.jubako.extensions.withJubako
@@ -47,13 +47,12 @@ class GridFillActivity : AppCompatActivity() {
         val crashRate = { (errorRates.selectedItem as String).split("/").first().toInt() }
         val tileSize = { (tileSize.selectedItem as String).toInt() }
 
-        jubako.load(GridFillAssembler(crashRate, tileSize, LayoutInflater.from(this)))
+        jubako.load(GridFillAssembler(crashRate, tileSize))
     }
 
     class GridFillAssembler(
         private val crashRate: () -> Int,
-        private val tileSize: () -> Int,
-        private val inflater: LayoutInflater
+        private val tileSize: () -> Int
     ) :
         SimpleJubakoAssembler() {
         var counter = 0
@@ -68,13 +67,15 @@ class GridFillActivity : AppCompatActivity() {
                 //
                 // Inflate a view for our carousel
                 //
-                view = {
-                    inflater.inflate(R.layout.simple_carousel, it, false)
+                view = { inflater, parent ->
+                    inflater.inflate(R.layout.simple_carousel, parent, false)
                 },
                 //
                 // Provide a lambda that will create our carousel item view holder
                 //
-                itemViewHolder = { SimpleCarouselItemViewHolder(inflater, it, tileSize) },
+                itemViewHolder = { inflater, parent ->
+                    SimpleCarouselItemViewHolder(inflater, parent, tileSize)
+                },
                 //
                 // Specify the data that will be loaded into the carousel
                 //

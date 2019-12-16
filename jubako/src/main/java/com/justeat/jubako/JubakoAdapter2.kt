@@ -24,7 +24,7 @@ open class JubakoAdapter(
     var onViewHolderBound: (contentViewHolder: JubakoViewHolder<Any>) -> Unit = {}
 
     var hasMore: Boolean = true
-    var state = PaginatedDataState<ContentDescription<Any>>(listOf(), listOf(), false, null, false)
+    var state = PaginatedDataState<ContentDescription<Any>>(listOf(), listOf(), true, null, false)
 
     interface HolderFactory<T> {
         fun createViewHolder(parent: ViewGroup): JubakoViewHolder<T>
@@ -84,7 +84,6 @@ open class JubakoAdapter(
         hasMore = more
         onStateChanged(newState, state)
         state = newState
-        false
     }
 
     private fun attachReloader(item: ContentDescription<Any>, holder: JubakoViewHolder<Any>) {

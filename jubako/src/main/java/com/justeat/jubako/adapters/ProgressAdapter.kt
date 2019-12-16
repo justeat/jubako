@@ -1,44 +1,29 @@
-package com.justeat.jubako.extensions
+package com.justeat.jubako.adapters
 
 import android.view.ViewGroup
-import android.widget.Adapter
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
+import com.justeat.jubako.data.PaginatedDataState
+import com.justeat.jubako.data.ready
 import com.justeat.jubako.util.IJubakoScreenFiller
 import com.justeat.jubako.util.JubakoScreenFiller
 
 @Suppress("UNCHECKED_CAST")
 abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>(
-    var logger: Jubako.Logger,
-    var itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
-    val progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder,
-    var screenFiller: IJubakoScreenFiller = IJubakoScreenFiller.NOOP
+    open var logger: Jubako.Logger,
+    open val progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder,
+    open var orientation: JubakoScreenFiller.Orientation
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
         const val VIEW_TYPE_PROGRESS = Int.MAX_VALUE
     }
 
-    data class State<T>(
-        var loaded: List<T>,
-        var page: List<T>,
-        var loading: Boolean = false,
-        var error: Throwable? = null,
-        var accepted: Boolean = false
-    ) {
-        fun accept(): Boolean {
-            if (!accepted) {
-                accepted = true
-                return true
-            }
-            return false
-        }
-    }
-
     private var progressPos: Int = 0
     private var scrollListener: RecyclerView.OnScrollListener? = null
+    private var screenFiller: IJubakoScreenFiller = IJubakoScreenFiller.NOOP
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+    final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         logger.log(TAG, "Create View Holder", "")
         return if (viewType == VIEW_TYPE_PROGRESS) {
             progressViewHolder(parent)
@@ -49,22 +34,24 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
 
     abstract fun onCreateViewHolderItem(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder
 
-    override fun getItemCount(): Int {
+    final override fun getItemCount(): Int {
         return getItemCountActual() + (if (getCurrentState().loading || getCurrentState().error != null) 1 else 0)
     }
 
     abstract fun getItemCountActual(): Int
-    abstract fun getCurrentState(): State<*>
+    abstract fun getCurrentState(): PaginatedDataState<*>
 
-    override fun getItemViewType(position: Int): Int {
+    final override fun getItemViewType(position: Int): Int {
         return if ((getCurrentState().loading || getCurrentState().error != null) && position == getItemCountActual()) {
             VIEW_TYPE_PROGRESS
         } else {
-            super.getItemViewType(position)
+            getItemViewTypeActual(position)
         }
     }
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    open fun getItemViewTypeActual(position: Int): Int = super.getItemViewType(position)
+
+    final override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         return when {
             getCurrentState().loading && position == getItemCountActual() -> {
                 logger.log(TAG, "Bind View Holder (progress)", "position: $position")
@@ -79,7 +66,7 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
             }
             else -> {
                 logger.log(TAG, "Bind View Holder", "position: $position")
-                itemBinder(holder as ITEM_HOLDER, getItem(position))
+                bindItemToHolder(holder as ITEM_HOLDER, getItem(position))
             }
         }
     }
@@ -87,29 +74,22 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
     abstract fun loadMore()
     abstract fun hasMoreToLoad(): Boolean
     abstract fun getItem(position: Int): ITEM_DATA
+    abstract fun bindItemToHolder(holder: ITEM_HOLDER, item: ITEM_DATA)
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
+    final override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
         super.onAttachedToRecyclerView(recyclerView)
         setupPaginatedLoading(recyclerView)
     }
 
     private fun setupPaginatedLoading(recyclerView: RecyclerView) {
-        // Implementations of init should setup change monitoring and call
-        // consumeState()
-        init()
-//        lifecycleOwner?.let {
-//            paginatedLiveData?.observe(it, Observer<PaginatedLiveData.State<*>> { state ->
-//                logger.log(TAG, "Observe State", "$state")
-//                consumeState(state)
-//            })
-//        }
+        init(recyclerView)
         setupLoadMoreScrollTrigger(recyclerView)
         initialFillBegin(recyclerView)
     }
 
-    abstract fun init()
+    abstract fun init(recyclerView: RecyclerView)
 
-    fun onStateChanged(state: State<*>, previousState: State<*>) {
+    fun onStateChanged(state: PaginatedDataState<*>, previousState: PaginatedDataState<*>) {
         if (state.accept()) {
             when {
                 state.error != null -> {
@@ -147,7 +127,7 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
         }
     }
 
-    private fun notifyAndContinue(state: State<*>) {
+    private fun notifyAndContinue(state: PaginatedDataState<*>) {
         logger.log(TAG, "Carousel Page Loaded", "")
         val start = state.loaded.size - state.page.size
         logger.log(
@@ -166,9 +146,23 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
 
         scrollListener = object : RecyclerView.OnScrollListener() {
             override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                val offset = recyclerView.computeHorizontalScrollOffset()
-                val range =
-                    recyclerView.computeHorizontalScrollRange() - recyclerView.computeHorizontalScrollExtent()
+                val offset = when (orientation) {
+                    JubakoScreenFiller.Orientation.HORIZONTAL -> {
+                        recyclerView.computeHorizontalScrollOffset()
+                    }
+                    JubakoScreenFiller.Orientation.VERTICAL -> {
+                        recyclerView.computeVerticalScrollOffset()
+                    }
+                }
+
+                val range = when (orientation) {
+                    JubakoScreenFiller.Orientation.HORIZONTAL -> {
+                        recyclerView.computeHorizontalScrollRange() - recyclerView.computeHorizontalScrollExtent()
+                    }
+                    JubakoScreenFiller.Orientation.VERTICAL -> {
+                        recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent()
+                    }
+                }
                 if (range != 0 && offset > range * 0.8f) {
                     logger.log(TAG, "Scroll Trigger Load", "")
                     if (getCurrentState().error == null && !getCurrentState().loading) {
@@ -182,22 +176,27 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
     }
 
     private fun initialFillBegin(recyclerView: RecyclerView) {
-        logger.log(TAG, "Initial Fill Across", "begin...")
+        if (orientation == JubakoScreenFiller.Orientation.HORIZONTAL) {
+            logger.log(TAG, "Initial Fill Across", "begin...")
+        } else {
+            logger.log(TAG, "Initial Fill Down", "begin...")
+        }
         if (getCurrentState().error == null) {
             loadMore()
         }
-        screenFiller = JubakoScreenFiller(orientation = JubakoScreenFiller.Orientation.HORIZONTAL,
+        screenFiller = JubakoScreenFiller(orientation = orientation,
             logger = logger, log = true, hasMore = { hasMoreToLoad() }, loadMore = {
                 if (getCurrentState().error == null) {
                     loadMore()
                 }
-            })
+            }, onFilled = ::onFilled
+        )
         screenFiller.attach(recyclerView)
+    }
+
+    open fun onFilled() {
+
     }
 }
 
-fun ProgressAdapter.State<*>?.ready(): Boolean {
-    return this != null && !loading && error == null
-}
-
-private val TAG = Adapter::class.java.simpleName
+private val TAG = ProgressAdapter::class.java.simpleName

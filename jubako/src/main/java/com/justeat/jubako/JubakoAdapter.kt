@@ -1,8 +1,8 @@
+/*
 package com.justeat.jubako
 
 import android.os.Handler
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.JubakoViewHolder.Event
@@ -40,7 +40,7 @@ open class JubakoAdapter(
     private fun listenForContentChanges() {
         //
         // Listens for changes in ContentDescriptionCollection and relays
-        // then to the adapter via the Adapter notify methods
+        // then to the adapter via the PaginatedDataAdapter notify methods
         //
         data.destination.listener =
             ContentAdapterContentDescriptionCollectionListener(this)
@@ -65,7 +65,7 @@ open class JubakoAdapter(
     private var inLoadingError = false
 
     private fun load() {
-        if(!inLoadingError) {
+        if (!inLoadingError) {
             loadingStrategy.load(lifecycleOwner, data,
                 onLoaded = {
                     hasMore = it
@@ -190,3 +190,4 @@ open class JubakoAdapter(
 }
 
 private val TAG = JubakoAdapter::class.java.simpleName
+*/

@@ -1,6 +1,7 @@
 package com.justeat.jubako
 
 import androidx.lifecycle.LifecycleOwner
+import com.justeat.jubako.data.PaginatedDataState
 
 interface ContentLoadingStrategy {
     /**
@@ -9,8 +10,7 @@ interface ContentLoadingStrategy {
     fun load(
         lifecycleOwner: LifecycleOwner,
         data: Jubako.Data,
-        onLoaded: (hasMore: Boolean) -> Boolean = { false },
-        onError: (error: Throwable) -> Unit = {}
+        callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Boolean
     )
 
     fun reload(lifecycleOwner: LifecycleOwner, position: Int, descriptions: ContentDescriptionCollection)

@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
+import com.justeat.jubako.adapters.JubakoRecyclerViewHolder
 import com.justeat.jubako.data.InstantLiveData
 import com.justeat.jubako.extensions.*
 import kotlinx.android.synthetic.main.activity_jubako_recycler.*

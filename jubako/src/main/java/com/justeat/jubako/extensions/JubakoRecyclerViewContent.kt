@@ -1,31 +1,19 @@
 package com.justeat.jubako.extensions
 
 import android.content.Context
-import android.os.Parcelable
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.CallSuper
 import androidx.annotation.IdRes
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
-import androidx.lifecycle.OnLifecycleEvent
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager.HORIZONTAL
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.ContentDescription
-import com.justeat.jubako.Jubako
-import com.justeat.jubako.JubakoViewHolder
-import com.justeat.jubako.R
+import com.justeat.jubako.adapters.DefaultProgressViewHolder
+import com.justeat.jubako.adapters.JubakoRecyclerViewHolder
 import com.justeat.jubako.data.PaginatedLiveData
-import com.justeat.jubako.data.PaginatedLiveData.State
-import com.justeat.jubako.data.ready
 import com.justeat.jubako.descriptionProvider
-import com.justeat.jubako.util.IJubakoScreenFiller
-import com.justeat.jubako.util.JubakoScreenFiller
 import com.justeat.jubako.viewHolderFactory
 
 /**
@@ -70,7 +58,7 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
     layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
     onReload: (ContentDescription<DATA>.(payload: Any?) -> Unit) = {},
     progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder = { parent ->
-        JubakoRecyclerViewHolder.DefaultProgressViewHolder(parent)
+        DefaultProgressViewHolder(parent)
     }
 ) {
     add(descriptionProvider {
@@ -131,7 +119,7 @@ fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM
     layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
     onReload: (ContentDescription<DATA>.(payload: Any?) -> Unit) = {},
     progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder = { parent ->
-        JubakoRecyclerViewHolder.DefaultProgressViewHolder(parent)
+        DefaultProgressViewHolder(parent)
     }
 ): ContentDescription<DATA> {
     return ContentDescription(
@@ -166,345 +154,4 @@ internal fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLD
     }
 }
 
-/**
- * An implementation of [JubakoViewHolder] setup with a [RecyclerView] and easy callback functions for generic
- * view holder creation and data binding.
- *
- * Not normally used directly, use derived types with [addRecyclerView] or [recyclerViewContent] functions when
- * assembling content.
- */
-open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>(itemView: View) :
-    JubakoViewHolder<DATA>(itemView) {
-
-    @IdRes
-    internal var recyclerViewId: Int = View.NO_ID
-    internal lateinit var itemViewHolder: (parent: ViewGroup) -> ITEM_HOLDER
-    internal var viewBinder: (Any) -> Unit = {}
-    internal var itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> }
-    internal var lifecycleOwner: LifecycleOwner? = null
-    lateinit var itemData: (data: DATA, position: Int) -> ITEM_DATA
-    lateinit var itemCount: (data: DATA) -> Int
-    lateinit var layoutManager: (context: Context) -> RecyclerView.LayoutManager
-    internal var paginatedLiveData: PaginatedLiveData<*>? = null
-    internal lateinit var progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder
-
-    private val recycler: RecyclerView by lazy {
-        when (recyclerViewId) {
-            View.NO_ID -> itemView as RecyclerView
-            else -> itemView.findViewById(recyclerViewId)
-        }.also { recycler ->
-            val layoutManager = layoutManager.invoke(recycler.context)
-            checkLayoutManager(layoutManager)
-            recycler.layoutManager = layoutManager
-        }
-    }
-
-    @CallSuper
-    override fun bind(data: DATA?) {
-        viewBinder(this)
-        data?.apply {
-            if (recycler.adapter == null) {
-                recycler.adapter = createAdapter(data)
-            }
-            trackState()
-        }
-    }
-
-    private fun trackState() {
-        val cachedState: Parcelable? = (description?.cache?.get(RECYCLER_VIEW_STATE) as Parcelable?)
-        cachedState?.let { inState ->
-            recycler.layoutManager?.onRestoreInstanceState(inState)
-        }
-
-        lifecycleOwner?.lifecycle?.addObserver(object : LifecycleObserver {
-            @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
-            fun onDestroy() {
-                lifecycleOwner?.let {
-                    paginatedLiveData?.removeObservers(it)
-                    it.lifecycle.removeObserver(this)
-                }
-                recycler.layoutManager?.onSaveInstanceState()?.let { outState ->
-                    description?.cache?.put(RECYCLER_VIEW_STATE, outState)
-                }
-            }
-        })
-    }
-
-    private fun createAdapter(data: DATA): RecyclerView.Adapter<RecyclerView.ViewHolder> {
-        if (paginatedLiveData == null) {
-            return Adapter2(
-                data = data,
-                logger = logger,
-                itemViewHolder = itemViewHolder,
-                itemBinder = itemBinder,
-                itemData = itemData,
-                itemCount = itemCount
-            )
-        } else {
-            return Adapter(
-                data = data,
-                logger = logger,
-                itemViewHolder = itemViewHolder,
-                itemBinder = itemBinder,
-                lifecycleOwner = lifecycleOwner!!,
-                itemData = itemData,
-                itemCount = itemCount,
-                paginatedLiveData = paginatedLiveData!!,
-                progressViewHolder = progressViewHolder
-            )
-        }
-    }
-
-    class DefaultProgressViewHolder(parent: ViewGroup, layoutId: Int = R.layout.default_progress) :
-        RecyclerView.ViewHolder(
-            LayoutInflater.from(parent.context).inflate(layoutId, parent, false)
-        ), ProgressView {
-        override fun setRetryCallback(retry: () -> Unit) {
-            itemView.findViewById<View>(R.id.button_retry).setOnClickListener {
-                retry.invoke()
-            }
-        }
-
-        override fun onProgress() {
-            itemView.findViewById<View>(R.id.progress).visibility = View.VISIBLE
-            itemView.findViewById<View>(R.id.button_retry).visibility = View.GONE
-        }
-
-        override fun onError(error: Throwable) {
-            itemView.findViewById<View>(R.id.progress).visibility = View.GONE
-            itemView.findViewById<View>(R.id.button_retry).visibility = View.VISIBLE
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    class Adapter2<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>(
-        private val data: DATA,
-        var logger: Jubako.Logger,
-        var itemViewHolder: (parent: ViewGroup) -> ITEM_HOLDER,
-        var itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
-        var itemData: (data: DATA, position: Int) -> ITEM_DATA,
-        var itemCount: (data: DATA) -> Int
-    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            logger.log(TAG, "Create View Holder", "")
-            return itemViewHolder(parent)
-        }
-
-        override fun getItemCount(): Int {
-            return itemCount(data)
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            itemBinder(holder as ITEM_HOLDER, itemData(data, position))
-        }
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    class Adapter<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>(
-        private val data: DATA,
-        var logger: Jubako.Logger,
-        var itemViewHolder: (parent: ViewGroup) -> ITEM_HOLDER,
-        var itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
-        var lifecycleOwner: LifecycleOwner,
-        var itemData: (data: DATA, position: Int) -> ITEM_DATA,
-        var itemCount: (data: DATA) -> Int,
-        var paginatedLiveData: PaginatedLiveData<*>,
-        val progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder,
-        var screenFiller: IJubakoScreenFiller = IJubakoScreenFiller.NOOP
-    ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-        companion object {
-            const val VIEW_TYPE_PROGRESS = Int.MAX_VALUE
-        }
-
-        private var progressPos: Int = 0
-        private var scrollListener: RecyclerView.OnScrollListener? = null
-
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-            logger.log(TAG, "Create View Holder", "")
-            return if (viewType == VIEW_TYPE_PROGRESS) {
-                progressViewHolder(parent)
-            } else {
-                itemViewHolder(parent)
-            }
-        }
-
-        override fun getItemCount(): Int {
-            return paginatedLiveData.state.let { state ->
-                itemCount(state as DATA) + (if (state.loading || state.error != null) 1 else 0)
-            }
-        }
-
-        override fun getItemViewType(position: Int): Int {
-            return paginatedLiveData.state.let { state ->
-                return if ((state.loading || state.error != null) && position == state.loaded.size) {
-                    VIEW_TYPE_PROGRESS
-                } else {
-                    super.getItemViewType(position)
-                }
-            }
-        }
-
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            paginatedLiveData.state.let { state ->
-                when {
-                    state.loading && position == state.loaded.size -> {
-                        logger.log(TAG, "Bind View Holder (progress)", "position: $position")
-                        (holder as ProgressView).onProgress()
-                    }
-                    state.error != null && position == state.loaded.size -> {
-                        logger.log(TAG, "Bind View Holder (error)", "position: $position")
-                        (holder as ProgressView).onError(state.error!!)
-                        (holder as ProgressView).setRetryCallback {
-                            paginatedLiveData?.loadMore()
-                        }
-                    }
-                    else -> {
-                        logger.log(TAG, "Bind View Holder", "position: $position")
-                        itemBinder(holder as ITEM_HOLDER, itemData(state as DATA, position))
-                    }
-                }
-
-            }
-        }
-
-        override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-            super.onAttachedToRecyclerView(recyclerView)
-            setupPaginatedLoading(recyclerView)
-        }
-
-        private fun setupPaginatedLoading(recyclerView: RecyclerView) {
-            paginatedLiveData.observe(lifecycleOwner, Observer<State<*>> { state ->
-                logger.log(TAG, "Observe State", "$state")
-                consumeState(state)
-            })
-            setupLoadMoreScrollTrigger(recyclerView)
-            initialFillBegin(recyclerView)
-        }
-
-        private fun consumeState(state: State<*>) {
-            if (state.accept()) {
-                val previousState = paginatedLiveData.previousState
-                when {
-                    state.error != null -> {
-                        logger.log(
-                            TAG,
-                            "Notify Item Changed (error)",
-                            "position: $progressPos"
-                        )
-                        notifyItemChanged(progressPos)
-                    }
-                    (!previousState.ready() && state.ready()) -> {
-                        progressPos = previousState.loaded.size
-                        logger.log(
-                            TAG,
-                            "Notify Item Removed (progress)",
-                            "position: $progressPos"
-                        )
-                        notifyItemRemoved(progressPos)
-                        notifyAndContinue(state)
-                    }
-                    (previousState.ready() && !state.ready()) -> {
-                        progressPos = state.loaded.size
-                        logger.log(
-                            TAG,
-                            "Notify Item Inserted (progress)",
-                            "item: $progressPos"
-                        )
-                        notifyItemInserted(progressPos)
-                    }
-                    else -> {
-                        logger.log(TAG, "Case 5", "")
-                        notifyAndContinue(state)
-                    }
-                }
-            }
-        }
-
-        private fun notifyAndContinue(state: State<*>) {
-            logger.log(TAG, "Carousel Page Loaded", "")
-            val start = state.loaded.size - state.page.size
-            logger.log(
-                TAG,
-                "Notify Item Range Inserted",
-                "start: $start, count: ${state.page.size}"
-            )
-            notifyItemRangeInserted(start, state.page.size)
-        }
-
-        private fun setupLoadMoreScrollTrigger(recyclerView: RecyclerView) {
-            if (scrollListener != null) {
-                recyclerView.removeOnScrollListener(scrollListener!!)
-                scrollListener = null
-            }
-
-            scrollListener = object : RecyclerView.OnScrollListener() {
-                override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                    val offset = recyclerView.computeHorizontalScrollOffset()
-                    val range =
-                        recyclerView.computeHorizontalScrollRange() - recyclerView.computeHorizontalScrollExtent()
-                    if (range != 0 && offset > range * 0.8f) {
-                        logger.log(TAG, "Scroll Trigger Load", "")
-                        paginatedLiveData.apply {
-                            if (state.error == null && !state.loading) {
-                                loadMore()
-                            }
-                        }
-                    }
-                }
-            }
-
-            recyclerView.addOnScrollListener(scrollListener!!)
-        }
-
-        private fun initialFillBegin(recyclerView: RecyclerView) {
-            logger.log(TAG, "Initial Fill Across", "begin...")
-            paginatedLiveData.apply {
-                if (state.error == null) {
-                    loadMore()
-                }
-                screenFiller = JubakoScreenFiller(orientation = JubakoScreenFiller.Orientation.HORIZONTAL,
-                    logger = logger, log = true, hasMore = { hasMore }, loadMore = {
-                        if (state.error == null) {
-                            loadMore()
-                        }
-                    })
-                screenFiller.attach(recyclerView)
-            }
-        }
-    }
-
-
-    private fun checkLayoutManager(layoutManager: RecyclerView.LayoutManager) {
-        paginatedLiveData?.let {
-            if ((layoutManager !is LinearLayoutManager || layoutManager.orientation != HORIZONTAL)) {
-                throw RuntimeException("You must use a LinearLayoutManager in HORIZONTAL orientation with PaginatedLiveData<T>")
-            }
-        }
-    }
-}
-
-/**
- * When providing a custom progress [RecyclerView.ViewHolder] for your carousels they
- * must implement this interface so Jubako can communicate state to your view holder
- */
-interface ProgressView {
-    /**
-     * WHen called you should show a progress indicator
-     */
-    fun onProgress()
-
-    /**
-     * When called you should show an error button or similar
-     */
-    fun onError(error: Throwable)
-
-    /**
-     * Gives you a callback that you can invoke with `retry.invoke()`  when you
-     * want to try loading again
-     */
-    fun setRetryCallback(retry: () -> Unit)
-}
-
 private val TAG = JubakoRecyclerViewHolder::class.java.simpleName
-private const val RECYCLER_VIEW_STATE = "jubako_recycler_view_state"

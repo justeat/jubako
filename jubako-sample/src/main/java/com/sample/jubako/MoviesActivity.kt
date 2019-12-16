@@ -14,6 +14,7 @@ import androidx.core.view.isGone
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
+import com.justeat.jubako.adapters.JubakoRecyclerViewHolder
 import com.justeat.jubako.data.InstantLiveData
 import com.justeat.jubako.extensions.*
 import com.squareup.picasso.Picasso

@@ -14,7 +14,7 @@ import com.justeat.jubako.ContentDescriptionProvider
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.SimpleJubakoAssembler
 import com.justeat.jubako.data.PaginatedLiveData
-import com.justeat.jubako.extensions.ProgressView
+import com.justeat.jubako.adapters.ProgressView
 import com.justeat.jubako.extensions.addRecyclerView
 import com.justeat.jubako.extensions.pageSize
 import com.justeat.jubako.extensions.withJubako
@@ -184,13 +184,11 @@ class GridFillActivity : AppCompatActivity() {
             return PaginatedLiveData {
                 hasMore = { loaded.size < NUM_COLUMNS }
                 nextPage = {
-                   // throwRandomError(crashRate)
+                    throwRandomError(crashRate)
                     listOf(((offset + loaded.size) % 2 == 0))
                 }
             }
         }
-
-
     }
 }
 

@@ -3,8 +3,16 @@ package com.justeat.jubako
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.*
-import kotlinx.coroutines.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProviders
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 
 open class Jubako : ViewModel(), CoroutineScope {
@@ -43,8 +51,7 @@ open class Jubako : ViewModel(), CoroutineScope {
 
         fun indexOf(item: ContentDescription<Any>?): Int = source.indexOf(item)
         fun loaded(item: ContentDescription<Any>): Boolean = destination.contains(item)
-        fun hasMore() = assembler.hasMore() &&
-                (loadingJob == null || loadingJob!!.isCompleted)
+        fun hasMore() = assembler.hasMore()
 
         fun assembleMore(): LiveData<State> {
             val liveData = MutableLiveData<State>()
@@ -53,10 +60,14 @@ open class Jubako : ViewModel(), CoroutineScope {
             loadingJob = scope.launch(Dispatchers.IO) {
                 try {
                     load(assembler)
-                    liveData.postValue(State.Assembled(this@Data))
+                    launch(Dispatchers.Main) {
+                        liveData.value = State.Assembled(this@Data)
+                    }
                 } catch (exception: Throwable) {
                     logger.log("Assemble Error", Log.getStackTraceString(exception))
-                    liveData.postValue(State.AssembleError(exception))
+                    launch(Dispatchers.Main) {
+                        liveData.value = State.AssembleError(exception)
+                    }
                 }
             }
 
@@ -88,14 +99,15 @@ open class Jubako : ViewModel(), CoroutineScope {
 
         loadingJob = launch(IO) {
             try {
-                loadingState.postValue(
-                    State.Assembled(
-                        completeAssemble(contentAssembler)
-                    )
-                )
+                val data = completeAssemble(contentAssembler)
+                launch(Dispatchers.Main) {
+                    loadingState.value = State.Assembled(data)
+                }
             } catch (exception: Throwable) {
-                logger.log(logger.tag,"Assemble Error", "${Log.getStackTraceString(exception)}")
-                loadingState.postValue(State.AssembleError(exception))
+                logger.log(logger.tag, "Assemble Error", "${Log.getStackTraceString(exception)}")
+                launch(Dispatchers.Main) {
+                    loadingState.value = State.AssembleError(exception)
+                }
             } finally {
                 loadingJob = null
             }
@@ -115,6 +127,7 @@ open class Jubako : ViewModel(), CoroutineScope {
         logger.log("Reset")
         loadingJob?.cancel()
         loadingJob = null
+        // TODO resetting fast causes an inconsistency clearing destination
         data?.destination?.clear()
         data = null
     }

@@ -6,7 +6,7 @@ package com.justeat.jubako
  */
 class ContentDescriptionCollection(var listener: Listener? = null) {
 
-    private var mContentDescriptions = mutableListOf<ContentDescription<*>>()
+    internal var mContentDescriptions = mutableListOf<ContentDescription<*>>()
 
     interface Listener {
         fun notifyItemChanged(index: Int, payload: Any?)

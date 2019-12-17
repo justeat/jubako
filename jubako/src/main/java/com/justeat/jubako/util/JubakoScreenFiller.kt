@@ -26,7 +26,7 @@ open class JubakoScreenFiller(
             if (hasMore()) {
                 val lm = (recyclerView.layoutManager as LinearLayoutManager)
                 val lastVisibleItemPos = lm.findLastVisibleItemPosition()
-                if (lastVisibleItemPos != RecyclerView.NO_POSITION) {
+                if (lastVisibleItemPos > RecyclerView.NO_POSITION) {
                     val view = lm.findViewByPosition(lastVisibleItemPos)
                     if (view == null && log) logger.log(TAG, "$lastVisibleItemPos view was null")
                     if (view != null) {
@@ -66,8 +66,13 @@ open class JubakoScreenFiller(
                                 "pos: $lastVisibleItemPos, extent: $extent, rect: $itemRect"
                             )
                             onFilled()
+                            // TODO once we are done we should detatch from
+                            //  draw complete callbacks however given
+                            //  the size of the loading indicator can cause
+                            //  grid fill example to not fill entirely to the end
+                            //  of the screen and prevents more items loading
                             // We are done no need to remain attached
-                            recyclerView.onDrawComplete = {}
+                            // recyclerView.onDrawComplete = {}
                         } else if (hasMore()) {
                             if (log) logger.log(
                                 TAG,

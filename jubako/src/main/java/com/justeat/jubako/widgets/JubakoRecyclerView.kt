@@ -100,10 +100,10 @@ open class JubakoRecyclerView @JvmOverloads constructor(
 
     override fun onMeasure(widthSpec: Int, heightSpec: Int) {
         super.onMeasure(widthSpec, heightSpec)
+        onDrawComplete()
     }
 
     override fun onDraw(c: Canvas?) {
         super.onDraw(c)
-        onDrawComplete()
     }
 }

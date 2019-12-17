@@ -18,6 +18,7 @@ import com.justeat.jubako.descriptionProvider
 import com.justeat.jubako.viewHolderFactory
 
 typealias CreateViewDelegate = ((layoutInflater: LayoutInflater, parent: ViewGroup) -> View)
+typealias CreateViewHolderDelegate<T> = (layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int) -> T
 
 /**
  * Convenience function to add a [RecyclerView] into the list to present data as carousels, grids, etc,
@@ -56,12 +57,12 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
     data: LiveData<DATA>,
     itemData: (data: DATA, position: Int) -> ITEM_DATA,
     itemCount: (data: DATA) -> Int,
-    itemViewHolder: (layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int) -> ITEM_HOLDER,
+    itemViewHolder: CreateViewHolderDelegate<ITEM_HOLDER>,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
     layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
     onReload: (ContentDescription<DATA>.(payload: Any?) -> Unit) = {},
-    progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder = { parent ->
-        DefaultProgressViewHolder(parent)
+    progressViewHolder: CreateViewHolderDelegate<RecyclerView.ViewHolder> = { inflater, parent, _ ->
+        DefaultProgressViewHolder(inflater, parent)
     }
 ) {
     add(descriptionProvider {
@@ -117,12 +118,12 @@ fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM
     data: LiveData<DATA>,
     itemData: (data: DATA, position: Int) -> ITEM_DATA,
     itemCount: (data: DATA) -> Int,
-    itemViewHolder: (layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int) -> ITEM_HOLDER,
+    itemViewHolder: CreateViewHolderDelegate<ITEM_HOLDER>,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
     layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
     onReload: (ContentDescription<DATA>.(payload: Any?) -> Unit) = {},
-    progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder = { parent ->
-        DefaultProgressViewHolder(parent)
+    progressViewHolder: CreateViewHolderDelegate<RecyclerView.ViewHolder> = { inflater, parent, _ ->
+        DefaultProgressViewHolder(inflater, parent)
     }
 ): ContentDescription<DATA> {
     return ContentDescription(

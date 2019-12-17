@@ -102,7 +102,9 @@ class GridFillActivity : AppCompatActivity() {
                 //
                 // A custom progress view holder for this carousel
                 //
-                progressViewHolder = { ProgressViewHolder(it, tileSize) }
+                progressViewHolder = { inflater, parent, _ ->
+                    ProgressViewHolder(inflater, parent, tileSize)
+                }
             )
 
             counter++
@@ -154,10 +156,8 @@ class GridFillActivity : AppCompatActivity() {
     //
     // A custom holder to show progress and error-retry state
     //
-    class ProgressViewHolder(parent: ViewGroup, tileSize: () -> Int) :
-        RecyclerView.ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.grid_fill_progress, parent, false)
-        ), ProgressView {
+    class ProgressViewHolder(inflater: LayoutInflater, parent: ViewGroup, tileSize: () -> Int) :
+        RecyclerView.ViewHolder(inflater.inflate(R.layout.grid_fill_progress, parent, false)), ProgressView {
         init {
             itemView.layoutParams = FrameLayout.LayoutParams(tileSize(), tileSize())
         }

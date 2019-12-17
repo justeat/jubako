@@ -1,17 +1,19 @@
 package com.justeat.jubako.adapters
 
+import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.data.PaginatedDataState
 import com.justeat.jubako.data.ready
+import com.justeat.jubako.extensions.CreateViewHolderDelegate
 import com.justeat.jubako.util.IJubakoScreenFiller
 import com.justeat.jubako.util.JubakoScreenFiller
 
 @Suppress("UNCHECKED_CAST")
 abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>(
     open var logger: Jubako.Logger,
-    open val progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder,
+    open val progressViewHolder: CreateViewHolderDelegate<RecyclerView.ViewHolder>,
     open var orientation: JubakoScreenFiller.Orientation
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -26,7 +28,7 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
     final override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         logger.log(TAG, "Create View Holder", "")
         return if (viewType == VIEW_TYPE_PROGRESS) {
-            progressViewHolder(parent)
+            progressViewHolder(LayoutInflater.from(parent.context), parent, viewType)
         } else {
             onCreateViewHolderItem(parent, viewType)
         }
@@ -129,7 +131,6 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
     }
 
     private fun notifyAndContinue(state: PaginatedDataState<*>) {
-        logger.log(TAG, "Carousel Page Loaded", "")
         val start = state.loaded.size - state.page.size
         logger.log(
             TAG,
@@ -186,7 +187,7 @@ abstract class ProgressAdapter<ITEM_DATA, ITEM_HOLDER : RecyclerView.ViewHolder>
             loadMore()
         }
         screenFiller = JubakoScreenFiller(orientation = orientation,
-            logger = logger, log = true, hasMore = { hasMoreToLoad() }, loadMore = {
+            logger = logger, log = orientation == JubakoScreenFiller.Orientation.VERTICAL, hasMore = { hasMoreToLoad() }, loadMore = {
                 if (getCurrentState().error == null) {
                     loadMore()
                 }

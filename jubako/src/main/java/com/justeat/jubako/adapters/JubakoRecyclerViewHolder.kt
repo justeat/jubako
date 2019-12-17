@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.JubakoViewHolder
 import com.justeat.jubako.data.PaginatedLiveData
+import com.justeat.jubako.extensions.CreateViewHolderDelegate
 import com.justeat.jubako.util.JubakoScreenFiller
 
 /**
@@ -29,7 +30,7 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
 
     @IdRes
     internal var recyclerViewId: Int = View.NO_ID
-    internal lateinit var itemViewHolder: (layoutInflater: LayoutInflater, parent: ViewGroup, viewType: Int) -> ITEM_HOLDER
+    internal lateinit var itemViewHolder: CreateViewHolderDelegate<ITEM_HOLDER>
     internal var viewBinder: (Any) -> Unit = {}
     internal var itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> }
     internal var lifecycleOwner: LifecycleOwner? = null
@@ -37,7 +38,7 @@ open class JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER : RecyclerView.
     lateinit var itemCount: (data: DATA) -> Int
     lateinit var layoutManager: (context: Context) -> RecyclerView.LayoutManager
     internal var paginatedLiveData: PaginatedLiveData<*>? = null
-    internal lateinit var progressViewHolder: (parent: ViewGroup) -> RecyclerView.ViewHolder
+    internal lateinit var progressViewHolder: CreateViewHolderDelegate<RecyclerView.ViewHolder>
 
     private val recycler: RecyclerView by lazy {
         when (recyclerViewId) {

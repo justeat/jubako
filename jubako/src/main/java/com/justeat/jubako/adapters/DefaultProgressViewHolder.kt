@@ -6,10 +6,12 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.R
 
-class DefaultProgressViewHolder(parent: ViewGroup, layoutId: Int = R.layout.default_progress) :
-    RecyclerView.ViewHolder(
-        LayoutInflater.from(parent.context).inflate(layoutId, parent, false)
-    ), ProgressView {
+class DefaultProgressViewHolder(
+    inflater: LayoutInflater,
+    parent: ViewGroup,
+    layoutId: Int = R.layout.default_progress
+) :
+    RecyclerView.ViewHolder(inflater.inflate(layoutId, parent, false)), ProgressView {
     override fun setRetryCallback(retry: () -> Unit) {
         itemView.findViewById<View>(R.id.button_retry).setOnClickListener {
             retry.invoke()

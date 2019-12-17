@@ -144,17 +144,16 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         data: Jubako.Data,
         callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Unit
     ) {
-        logger.log(TAG, "Proceed", "onReload: $reset")
         if (!reset) {
             pagedDescriptions.add(currentDescription!!)
-            logger.log(
-                TAG,
-                "Proceed",
-                "paged count:${pagedDescriptions.size}, dest size: ${data.destination.size()}, source size: ${data.source.size}"
-            )
 
             when {
                 hasPageWorth(data) -> {
+                    logger.log(
+                        TAG,
+                        "Dispatch Page",
+                        "paged count:${pagedDescriptions.size}, dest size: ${data.destination.size()}, source size: ${data.source.size}"
+                    )
                     data.destination.addAll(pagedDescriptions)
                     val page = pagedDescriptions.toList()
                     pagedDescriptions = mutableListOf()

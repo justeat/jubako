@@ -8,10 +8,9 @@ import com.justeat.jubako.Jubako
 import com.justeat.jubako.extensions.addView
 import com.justeat.jubako.extensions.load
 import com.justeat.jubako.extensions.withJubako
-import kotlinx.android.synthetic.main.activity_jubako_recycler.*
+import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 
 class HelloJubakoActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_jubako_recycler)

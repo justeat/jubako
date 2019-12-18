@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.ContentDescription
 import com.justeat.jubako.adapters.DefaultProgressViewHolder
 import com.justeat.jubako.adapters.JubakoRecyclerViewHolder
+import com.justeat.jubako.data.PaginatedDataState
 import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.descriptionProvider
 import com.justeat.jubako.viewHolderFactory
@@ -55,8 +56,20 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
     @IdRes recyclerViewId: Int = View.NO_ID,
     viewBinder: (holder: HOLDER) -> Unit = {},
     data: LiveData<DATA>,
-    itemData: (data: DATA, position: Int) -> ITEM_DATA,
-    itemCount: (data: DATA) -> Int,
+    itemData: (data: DATA, position: Int) -> ITEM_DATA = { data, position ->
+        if (data is PaginatedDataState<*>) {
+            data.loaded[position] as ITEM_DATA
+        } else {
+            throw Error("You must specify itemData argument")
+        }
+    },
+    itemCount: (data: DATA) -> Int = { data: DATA ->
+        if (data is PaginatedDataState<*>) {
+            data.loaded.size
+        } else {
+            throw Error("You must specify itemCount argument")
+        }
+    },
     itemViewHolder: CreateViewHolderDelegate<ITEM_HOLDER>,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
     layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },

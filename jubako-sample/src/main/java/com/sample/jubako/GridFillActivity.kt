@@ -80,6 +80,9 @@ class GridFillActivity : AppCompatActivity() {
                 // Specify the data that will be loaded into the carousel
                 //
                 data = getGridCell(counter, crashRate),
+                //
+                // Specify a viewBinder that will allow binding between data and item holder
+                //
                 itemBinder = { holder, data: Boolean? ->
                     holder.itemView.setBackgroundColor(
                         when (data) {

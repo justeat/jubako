@@ -56,20 +56,8 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
     @IdRes recyclerViewId: Int = View.NO_ID,
     viewBinder: (holder: HOLDER) -> Unit = {},
     data: LiveData<DATA>,
-    itemData: (data: DATA, position: Int) -> ITEM_DATA = { data, position ->
-        if (data is PaginatedDataState<*>) {
-            data.loaded[position] as ITEM_DATA
-        } else {
-            throw Error("You must specify itemData argument")
-        }
-    },
-    itemCount: (data: DATA) -> Int = { data: DATA ->
-        if (data is PaginatedDataState<*>) {
-            data.loaded.size
-        } else {
-            throw Error("You must specify itemCount argument")
-        }
-    },
+    itemData: (data: DATA, position: Int) -> ITEM_DATA = defaultItemData(),
+    itemCount: (data: DATA) -> Int = defaultItemCount(),
     itemViewHolder: CreateViewHolderDelegate<ITEM_HOLDER>,
     itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
     layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
@@ -217,4 +205,22 @@ internal fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLD
     }
 }
 
-private val TAG = JubakoRecyclerViewHolder::class.java.simpleName
+private fun <DATA> defaultItemCount(): (DATA) -> Int {
+    return { data: DATA ->
+        if (data is PaginatedDataState<*>) {
+            data.loaded.size
+        } else {
+            throw Error("You must specify itemCount argument")
+        }
+    }
+}
+
+private fun <DATA, ITEM_DATA> defaultItemData(): (DATA, Int) -> ITEM_DATA {
+    return { data, position ->
+        if (data is PaginatedDataState<*>) {
+            data.loaded[position] as ITEM_DATA
+        } else {
+            throw Error("You must specify itemData argument")
+        }
+    }
+}

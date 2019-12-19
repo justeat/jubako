@@ -83,7 +83,7 @@ class GridFillActivity : AppCompatActivity() {
                 //
                 // Specify a viewBinder that will allow binding between data and item holder
                 //
-                itemBinder = { holder, data: Boolean? ->
+                itemBinder = { holder, data ->
                     holder.itemView.setBackgroundColor(
                         when (data) {
                             true -> Color.BLACK

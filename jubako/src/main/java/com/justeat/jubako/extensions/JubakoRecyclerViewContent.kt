@@ -96,6 +96,45 @@ RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
     })
 }
 
+fun <HOLDER : JubakoRecyclerViewHolder<PaginatedDataState<ITEM_DATA>, ITEM_DATA, ITEM_HOLDER>, ITEM_DATA, ITEM_HOLDER :
+RecyclerView.ViewHolder> JubakoMutableList.addRecyclerView(
+    view: CreateViewDelegate? = null,
+    viewHolder: (parent: ViewGroup) -> HOLDER = defaultRecyclerViewHolder(view),
+    @IdRes recyclerViewId: Int = View.NO_ID,
+    viewBinder: (holder: HOLDER) -> Unit = {},
+    data: PaginatedLiveData<ITEM_DATA>,
+    itemData: (data: PaginatedDataState<ITEM_DATA>, position: Int) -> ITEM_DATA = { data, position ->
+        data.loaded[position]
+    },
+    itemCount: (data: PaginatedDataState<ITEM_DATA>) -> Int = { data ->
+        data.loaded.size
+    },
+    itemViewHolder: CreateViewHolderDelegate<ITEM_HOLDER>,
+    itemBinder: (holder: ITEM_HOLDER, data: ITEM_DATA?) -> Unit = { _, _ -> },
+    layoutManager: (context: Context) -> RecyclerView.LayoutManager = { LinearLayoutManager(it, HORIZONTAL, false) },
+    onReload: (ContentDescription<PaginatedDataState<ITEM_DATA>>.(payload: Any?) -> Unit) = {},
+    progressViewHolder: CreateViewHolderDelegate<RecyclerView.ViewHolder> = { inflater, parent, _ ->
+        DefaultProgressViewHolder(inflater, parent)
+    }
+) {
+    add(descriptionProvider {
+        recyclerViewContent(
+            view,
+            viewHolder,
+            recyclerViewId,
+            viewBinder,
+            data,
+            itemData,
+            itemCount,
+            itemViewHolder,
+            itemBinder,
+            layoutManager,
+            onReload,
+            progressViewHolder
+        )
+    })
+}
+
 /**
  * Convenience function to create a recycler view based content description
  *

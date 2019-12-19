@@ -3,7 +3,15 @@ package com.sample.jubako
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.activity_home.sampleEnterpriseHello
+import kotlinx.android.synthetic.main.activity_home.sampleGridFill
+import kotlinx.android.synthetic.main.activity_home.sampleHelloButton
+import kotlinx.android.synthetic.main.activity_home.sampleInfiniteHello
+import kotlinx.android.synthetic.main.activity_home.sampleLoadAsync
+import kotlinx.android.synthetic.main.activity_home.sampleMovies
+import kotlinx.android.synthetic.main.activity_home.sampleRowUpdates
+import kotlinx.android.synthetic.main.activity_home.sampleSelfUpdatingItems
+import kotlinx.android.synthetic.main.activity_home.sampleSimpleCarousels
 
 class HomeActivity : AppCompatActivity() {
 

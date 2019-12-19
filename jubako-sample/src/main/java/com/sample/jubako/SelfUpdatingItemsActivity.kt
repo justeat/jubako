@@ -12,7 +12,7 @@ import com.justeat.jubako.extensions.addDescription
 import com.justeat.jubako.extensions.load
 import com.justeat.jubako.extensions.withJubako
 import com.justeat.jubako.viewHolderFactory
-import kotlinx.android.synthetic.main.activity_jubako_recycler.*
+import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 
 class SelfUpdatingItemsActivity : AppCompatActivity() {
 

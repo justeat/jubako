@@ -139,6 +139,13 @@ fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM
         DefaultProgressViewHolder(inflater, parent)
     }
 ): ContentDescription<DATA> {
+
+    if (data is PaginatedLiveData<*>) {
+        assert(layoutManager is LinearLayoutManager && layoutManager.orientation == HORIZONTAL) {
+            "PaginatedLiveData<T> is only compatible with a HORIZONTAL LinearLayoutManagers"
+        }
+    }
+
     return ContentDescription(
         viewHolderFactory = viewHolderFactory { parent ->
             viewHolder(parent).also { holder ->

@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
+import com.justeat.jubako.data.PaginatedLiveData
 import com.justeat.jubako.extensions.addRecyclerView
 import com.justeat.jubako.extensions.load
 import com.justeat.jubako.extensions.pageSize

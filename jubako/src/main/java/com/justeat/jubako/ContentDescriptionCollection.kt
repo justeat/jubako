@@ -1,38 +1,29 @@
 package com.justeat.jubako
 
 /**
- * Wrapper round list to manage the insertion/deletion of destination blocks
- * and a convenient listener for adapter integrations
+ * List of rendered content descriptions
  */
 class ContentDescriptionCollection(var listener: Listener? = null) {
 
-    internal var mContentDescriptions = mutableListOf<ContentDescription<*>>()
+    private var descriptions = mutableListOf<ContentDescription<*>>()
 
     interface Listener {
         fun notifyItemChanged(index: Int, payload: Any?)
-
-        fun notifyItemInserted(index: Int)
-
-        fun notifyItemRemoved(index: Int)
-
-        fun notifyDataSetChanged()
-        fun notifyItemRangeInserted(positionStart: Int, itemCount: Int)
         fun notifyItemRangeRemoved(positionStart: Int, itemCount: Int)
     }
 
     operator fun get(index: Int): ContentDescription<Any> {
-        return mContentDescriptions.get(index) as ContentDescription<Any>
+        return descriptions[index] as ContentDescription<Any>
     }
 
     fun size(): Int {
-        return mContentDescriptions.size
+        return descriptions.size
     }
 
     fun clear() {
-        val size = mContentDescriptions.size
-        mContentDescriptions.clear()
-        mContentDescriptions = mutableListOf()
-        notifyItemRangeRemoved(0, size)
+        val size = descriptions.size
+        descriptions.clear()
+        listener?.notifyItemRangeRemoved(0, size)
     }
 
     /**
@@ -40,36 +31,21 @@ class ContentDescriptionCollection(var listener: Listener? = null) {
      */
     fun addAll(descriptions: List<ContentDescription<*>>) {
         if (descriptions.isEmpty()) return
-
-        val positionStart = mContentDescriptions.size
-        val itemCount = descriptions.size
-        mContentDescriptions = (mContentDescriptions + descriptions).toMutableList()
-
-        notifyItemRangeInserted(positionStart, itemCount)
+        this.descriptions = (this.descriptions + descriptions).toMutableList()
     }
 
     fun replace(index: Int, description: ContentDescription<*>) {
-        mContentDescriptions[index] = description
+        descriptions[index] = description
         notifyItemChanged(index)
     }
 
     fun contains(description: ContentDescription<*>): Boolean {
-        return mContentDescriptions.contains(description)
-    }
-
-    private fun notifyItemInserted(index: Int) {
-        listener?.notifyItemInserted(index)
-    }
-
-    private fun notifyItemRangeInserted(positionStart: Int, itemCount: Int) {
-        listener?.notifyItemRangeInserted(positionStart, itemCount)
+        return descriptions.contains(description)
     }
 
     private fun notifyItemChanged(index: Int) {
-        listener?.notifyItemChanged(index, mContentDescriptions[index])
+        listener?.notifyItemChanged(index, descriptions[index])
     }
 
-    private fun notifyItemRangeRemoved(positionStart: Int, itemCount: Int) {
-        listener?.notifyItemRangeRemoved(positionStart, itemCount)
-    }
+    fun asList(): List<ContentDescription<*>> = descriptions.toList()
 }

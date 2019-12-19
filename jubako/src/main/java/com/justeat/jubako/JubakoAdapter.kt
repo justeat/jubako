@@ -19,7 +19,7 @@ open class JubakoAdapter(
     override val progressViewHolder: CreateViewHolderDelegate<RecyclerView.ViewHolder> = { inflater, parent, _ ->
         DefaultProgressViewHolder(inflater, parent)
     }
-) : ProgressAdapter<Any, JubakoViewHolder<Any>>(
+) : ProgressAdapter<ContentDescription<Any>, JubakoViewHolder<Any>>(
     Jubako.logger, progressViewHolder, JubakoScreenFiller.Orientation.VERTICAL
 ) {
     private val handler = Handler()
@@ -56,17 +56,14 @@ open class JubakoAdapter(
     override fun getItemCountActual(): Int = data.numItemsLoaded()
     override fun getCurrentState(): PaginatedDataState<*> = state
     override fun loadMore() = load()
-    override fun hasMoreToLoad(): Boolean {
-        return hasMore
-    }
+    override fun hasMoreToLoad(): Boolean = hasMore
 
-    override fun getItem(position: Int): Any = data.getItem(position)
+    override fun getItem(position: Int): ContentDescription<Any> = data.getItem(position)
 
-    override fun bindItemToHolder(holder: JubakoViewHolder<Any>, item: Any) {
-        val description = (item as ContentDescription<Any>)
-        holder.onClickDelegate = { postViewHolderEvent(Event.Click(description.id, it)) }
-        attachReloader(description, holder)
-        bindWhenNewOrDefault(description, holder)
+    override fun bindItemToHolder(holder: JubakoViewHolder<Any>, item: ContentDescription<Any>) {
+        holder.onClickDelegate = { postViewHolderEvent(Event.Click(item.id, it)) }
+        attachReloader(item, holder)
+        bindWhenNewOrDefault(item, holder)
         onViewHolderBound(holder)
     }
 

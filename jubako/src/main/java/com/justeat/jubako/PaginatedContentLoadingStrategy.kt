@@ -46,7 +46,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
 
         callback(
             PaginatedDataState(
-                loaded = data.destination.mContentDescriptions.toList() as List<ContentDescription<Any>>,
+                loaded = data.destination.asList() as List<ContentDescription<Any>>,
                 page = listOf(),
                 loading = true,
                 error = null,
@@ -85,7 +85,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
             } else {
                 callback(
                     PaginatedDataState(
-                        loaded = data.destination.mContentDescriptions.toList() as List<ContentDescription<Any>>,
+                        loaded = data.destination.asList() as List<ContentDescription<Any>>,
                         page = listOf(),
                         loading = false,
                         error = null,
@@ -161,7 +161,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
 
                     callback(
                         PaginatedDataState(
-                            data.destination.mContentDescriptions as List<ContentDescription<Any>>,
+                            data.destination.asList() as List<ContentDescription<Any>>,
                             page,
                             false,
                             null,
@@ -255,7 +255,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
                 is Jubako.State.AssembleError -> {
                     callback(
                         PaginatedDataState(
-                            loaded = data.destination.mContentDescriptions.toList() as List<ContentDescription<Any>>,
+                            loaded = data.destination.asList() as List<ContentDescription<Any>>,
                             page = listOf(),
                             loading = false,
                             error = state.error,

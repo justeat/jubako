@@ -9,7 +9,7 @@ import org.junit.rules.TestRule
 
 class PaginatedLiveDataTest {
 
-    private var state: PaginatedLiveData.State<Item>? = null
+    private var state: PaginatedDataState<Item>? = null
 
     private val mocKError = Error()
 

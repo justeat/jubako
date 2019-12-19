@@ -4,6 +4,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.Observer
 import com.justeat.jubako.data.EmptyLiveData
+import com.justeat.jubako.data.PaginatedDataState
 import com.justeat.jubako.data.PaginatedLiveData
 
 open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_PAGE_SIZE) : ContentLoadingStrategy {
@@ -30,19 +31,30 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
     override fun load(
         lifecycleOwner: LifecycleOwner,
         data: Jubako.Data,
-        onLoaded: (hasMore: Boolean) -> Boolean
+        callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Unit
     ) {
         logger.log(TAG, "Load", "onReload: $reset, loading observers: ${loadingData.size}")
-        if (BuildConfig.DEBUG) {
-            TEMP_integrityCheck(data.source, data.destination)
-        }
+//        if (BuildConfig.DEBUG) {
+//            TEMP_integrityCheck(data.source, data.destination)
+//        }
 
         if (loadingData.size > 0) {
             logger.log(TAG, "Busy", "already loading")
             return
         }
         reset = false
-        loadDescriptions(lifecycleOwner, data, onLoaded)
+
+        callback(
+            PaginatedDataState(
+                loaded = data.destination.asList() as List<ContentDescription<Any>>,
+                page = listOf(),
+                loading = true,
+                error = null,
+                accepted = false
+            ), true
+        )
+
+        loadDescriptions(lifecycleOwner, data, callback)
     }
 
     private fun TEMP_integrityCheck(
@@ -52,7 +64,7 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         if (destination.size() > 0) {
             for (i in 0 until destination.size()) {
                 if (source[i] != destination[i]) {
-                    throw RuntimeException("Failed integrity check")
+                    throw RuntimeException("Failed integrity check, source size ${source.size}, dest size: ${destination.size()}, source: ${source[i]}, dest: ${destination[i]}")
                 }
             }
         }
@@ -61,35 +73,44 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
     private fun loadDescriptions(
         lifecycleOwner: LifecycleOwner,
         data: Jubako.Data,
-        onLoaded: (hasMore: Boolean) -> Boolean
+        callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Unit
     ) {
         logger.log(TAG, "Load Descriptions", "onReload: $reset")
         if (data.destination.size() == data.source.size) {
             if (data.hasMore()) {
                 val moreData = data.assembleMore()
-                val observer = LoadMoreObserver(moreData, data, lifecycleOwner, this, onLoaded)
+                val observer = LoadMoreObserver(moreData, data, lifecycleOwner, this, callback)
                 loadingData[observer] = moreData as LiveData<Any>
                 moreData.observe(lifecycleOwner, observer)
             } else {
+                callback(
+                    PaginatedDataState(
+                        loaded = data.destination.asList() as List<ContentDescription<Any>>,
+                        page = listOf(),
+                        loading = false,
+                        error = null,
+                        accepted = false
+                    ), true
+                )
+
                 logger.log(
                     TAG,
                     "Stop Loading",
                     "dest size: ${data.destination.size()}, source size: ${data.source.size}"
                 )
-                onLoaded(false)
             }
             return
         } else if (data.destination.size() > data.source.size) {
             throw RuntimeException("destination can not be great than source")
         }
 
-        loadNext(data, lifecycleOwner, onLoaded)
+        loadNext(data, lifecycleOwner, callback)
     }
 
     private fun loadNext(
         data: Jubako.Data,
         lifecycleOwner: LifecycleOwner,
-        onLoaded: (hasMore: Boolean) -> Boolean
+        callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Unit
     ) {
         //
         // Lets get the next descriptionProvider to load...
@@ -101,11 +122,11 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
             description.data.let {
                 when (it) {
                     is EmptyLiveData -> {
-                        proceed(lifecycleOwner, data, onLoaded)
+                        proceed(lifecycleOwner, data, callback)
                     }
                     else -> {
                         logger.log(TAG, "Observe Description", "$currentDescription")
-                        val observer = LoadDescriptionObserver(it, lifecycleOwner, data, onLoaded)
+                        val observer = LoadDescriptionObserver(it, lifecycleOwner, data, callback)
                         loadingData[observer] = it
                         it.observe(lifecycleOwner, observer)
                         if (it is PaginatedLiveData<*>) {
@@ -121,39 +142,42 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
     private fun proceed(
         lifecycleOwner: LifecycleOwner,
         data: Jubako.Data,
-        onLoaded: (hasMore: Boolean) -> Boolean
+        callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Unit
     ) {
-        logger.log(TAG, "Proceed", "onReload: $reset")
         if (!reset) {
             pagedDescriptions.add(currentDescription!!)
-            logger.log(
-                TAG,
-                "Proceed",
-                "paged count:${pagedDescriptions.size}, dest size: ${data.destination.size()}, source size: ${data.source.size}"
-            )
 
             when {
                 hasPageWorth(data) -> {
-                    dispatchPage(data.destination)
+                    logger.log(
+                        TAG,
+                        "Dispatch Page",
+                        "paged count:${pagedDescriptions.size}, dest size: ${data.destination.size()}, source size: ${data.source.size}"
+                    )
+                    data.destination.addAll(pagedDescriptions)
+                    val page = pagedDescriptions.toList()
+                    pagedDescriptions = mutableListOf()
                     val hasMore = data.destination.size() < data.source.size || data.hasMore()
-                    if (onLoaded(hasMore) && hasMore) {
-                        loadDescriptions(lifecycleOwner, data, onLoaded)
-                    }
+
+                    callback(
+                        PaginatedDataState(
+                            data.destination.asList() as List<ContentDescription<Any>>,
+                            page,
+                            false,
+                            null,
+                            false
+                        ),
+                        hasMore
+                    )
                 }
-                else -> loadDescriptions(lifecycleOwner, data, onLoaded)
+                else -> loadDescriptions(lifecycleOwner, data, callback)
             }
         }
     }
 
     private fun hasPageWorth(data: Jubako.Data) =
         pagedDescriptions.size == pageSize ||
-                (data.destination.size() + pagedDescriptions.size) == data.source.size
-
-    private fun dispatchPage(destination: ContentDescriptionCollection) {
-        logger.log(TAG, "Dispatch Page", "size: ${pagedDescriptions.size}")
-        destination.addAll(pagedDescriptions)
-        pagedDescriptions.clear()
-    }
+            (data.destination.size() + pagedDescriptions.size) == data.source.size
 
     override fun reload(lifecycleOwner: LifecycleOwner, position: Int, descriptions: ContentDescriptionCollection) {
         val item = descriptions[position]
@@ -170,19 +194,19 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         private val data: LiveData<Any>,
         private val lifecycleOwner: LifecycleOwner,
         private val jubakoData: Jubako.Data,
-        private val onLoaded: (hasMore: Boolean) -> Boolean
+        private val callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Unit
     ) : Observer<Any>,
         Cancellable {
         override var cancelled = false
         override fun onChanged(data: Any?) {
+            proceed()
+        }
+
+        private fun proceed() {
             loadingData.remove(this)
             this.data.removeObserver(this)
-            if (data is PaginatedLiveData.State<*>) {
-                logger.log(TAG, "Accept Live Data Page", "$currentDescription")
-                data.accept()
-            }
             if (!cancelled) {
-                proceed(lifecycleOwner, jubakoData, onLoaded)
+                proceed(lifecycleOwner, jubakoData, callback)
             } else {
                 logger.log(TAG, "Load Cancelled", "$currentDescription")
             }
@@ -213,17 +237,33 @@ open class PaginatedContentLoadingStrategy(private val pageSize: Int = DEFAULT_P
         private val data: Jubako.Data,
         private val lifecycleOwner: LifecycleOwner,
         private val strategy: PaginatedContentLoadingStrategy,
-        private val onLoaded: (hasMore: Boolean) -> Boolean
+        private val callback: (state: PaginatedDataState<ContentDescription<Any>>, hasMore: Boolean) -> Unit
     ) : Observer<Jubako.State>,
         Cancellable {
         override var cancelled = false
         override fun onChanged(state: Jubako.State?) {
             moreData.removeObserver(this)
             loadingData.remove(this)
-            if (!cancelled) {
-                strategy.loadNext(data, lifecycleOwner, onLoaded)
-            } else {
-                logger.log(TAG, "Load More Cancelled", "$currentDescription")
+            when (state) {
+                is Jubako.State.Assembled -> {
+                    if (!cancelled) {
+                        strategy.loadNext(data, lifecycleOwner, callback)
+                    } else {
+                        logger.log(TAG, "Load More Cancelled", "$currentDescription")
+                    }
+                }
+                is Jubako.State.AssembleError -> {
+                    callback(
+                        PaginatedDataState(
+                            loaded = data.destination.asList() as List<ContentDescription<Any>>,
+                            page = listOf(),
+                            loading = false,
+                            error = state.error,
+                            accepted = false
+                        ),
+                        false
+                    )
+                }
             }
         }
     }

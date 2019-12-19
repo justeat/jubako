@@ -7,11 +7,21 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.lifecycle.MutableLiveData
-import com.justeat.jubako.*
-import com.justeat.jubako.Jubako.State.*
+import com.justeat.jubako.ContentDescription
+import com.justeat.jubako.ContentDescriptionProvider
+import com.justeat.jubako.Jubako
+import com.justeat.jubako.Jubako.State.AssembleError
+import com.justeat.jubako.Jubako.State.Assembled
+import com.justeat.jubako.Jubako.State.Assembling
+import com.justeat.jubako.JubakoAdapter
+import com.justeat.jubako.JubakoViewHolder
+import com.justeat.jubako.SimpleJubakoAssembler
 import com.sample.jubako.EnterpriseHelloJubakoActivity.HelloContentDescriptionProvider.Language.ENGLISH
 import com.sample.jubako.EnterpriseHelloJubakoActivity.HelloContentDescriptionProvider.Language.JAPANESE
-import kotlinx.android.synthetic.main.activity_jubako_recycler.*
+import kotlinx.android.synthetic.main.activity_jubako_recycler.error
+import kotlinx.android.synthetic.main.activity_jubako_recycler.loadingIndicator
+import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
+import kotlinx.android.synthetic.main.activity_jubako_recycler.retryButton
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
@@ -37,11 +47,8 @@ class EnterpriseHelloJubakoActivity : AppCompatActivity() {
                     showError()
                 }
                 is Assembled -> {
-                    recyclerView.adapter = JubakoAdapter(this, state.data).apply {
-                        onInitialFill = {
-                            showContent()
-                        }
-                    }
+                    recyclerView.adapter = JubakoAdapter(this, state.data)
+                    showContent()
                 }
             }
         }
@@ -57,7 +64,7 @@ class EnterpriseHelloJubakoActivity : AppCompatActivity() {
     }
 
     class HelloJubakoAssembler : SimpleJubakoAssembler() {
-        override fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {
+        override suspend fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {
             if (randomTime() > FAILURE_THRESHOLD_MS) {
                 throw Error("Something went wrong")
             }

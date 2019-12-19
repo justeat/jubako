@@ -10,10 +10,9 @@ import com.justeat.jubako.Jubako
 import com.justeat.jubako.SimpleJubakoAssembler
 import com.justeat.jubako.extensions.addView
 import com.justeat.jubako.extensions.withJubako
-import kotlinx.android.synthetic.main.activity_jubako_recycler.*
+import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 
 class InfiniteHelloJubakoActivity : AppCompatActivity() {
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_jubako_recycler)
@@ -33,7 +32,7 @@ class InfiniteHelloJubakoActivity : AppCompatActivity() {
         //
         override fun hasMore() = true
 
-        override fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {
+        override suspend fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {
             // pages of ten
             for (i in 0 until 10) {
                 val num = ++counter

@@ -1,113 +1,48 @@
 package com.justeat.jubako
 
 import android.os.Handler
-import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.LifecycleOwner
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.JubakoViewHolder.Event
+import com.justeat.jubako.adapters.DefaultProgressViewHolder
+import com.justeat.jubako.adapters.ProgressAdapter
+import com.justeat.jubako.data.PaginatedDataState
+import com.justeat.jubako.extensions.CreateViewHolderDelegate
+import com.justeat.jubako.util.JubakoScreenFiller
+import com.justeat.jubako.widgets.JubakoRecyclerView
 
 open class JubakoAdapter(
     private val lifecycleOwner: LifecycleOwner,
     private val data: Jubako.Data,
-    private val loadingStrategy: ContentLoadingStrategy = PaginatedContentLoadingStrategy()
-) : RecyclerView.Adapter<JubakoViewHolder<Any>>() {
-
+    private val loadingStrategy: ContentLoadingStrategy = PaginatedContentLoadingStrategy(),
+    override val progressViewHolder: CreateViewHolderDelegate<RecyclerView.ViewHolder> = { inflater, parent, _ ->
+        DefaultProgressViewHolder(inflater, parent)
+    }
+) : ProgressAdapter<ContentDescription<Any>, JubakoViewHolder<Any>>(
+    Jubako.logger, progressViewHolder, JubakoScreenFiller.Orientation.VERTICAL
+) {
+    private val handler = Handler()
     var onInitialFill: () -> Unit = {}
     var onViewHolderBound: (contentViewHolder: JubakoViewHolder<Any>) -> Unit = {}
 
-    private val handler = Handler()
-    var logger = Jubako.logger
+    var hasMore: Boolean = true
+    var state = PaginatedDataState<ContentDescription<Any>>(listOf(), listOf(), true, null, false)
 
     interface HolderFactory<T> {
         fun createViewHolder(parent: ViewGroup): JubakoViewHolder<T>
     }
 
-    override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
-        logger.log(TAG, "On Attach", "total rows: ${data.source.size}")
-        setupLoadMoreScrollTrigger(recyclerView)
-        initialFillOnLayoutChanged(recyclerView)
-        listenForContentChanges()
+    override fun init(recyclerView: RecyclerView) {
+        load()
+        (recyclerView as JubakoRecyclerView).onDrawComplete = {} // TODO why?
+        data.destination.listener = ContentAdapterContentDescriptionCollectionListener(this)
     }
 
-    private fun listenForContentChanges() {
-        //
-        // Listens for changes in ContentDescriptionCollection and relays
-        // then to the adapter via the Adapter notify methods
-        //
-        data.destination.listener =
-            ContentAdapterContentDescriptionCollectionListener(this)
-    }
+    override fun onCreateViewHolderItem(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        val factory = data.viewHolderFactories[viewType]
 
-    private fun initialFillOnLayoutChanged(recyclerView: RecyclerView) {
-        logger.log(TAG, "Initial Fill Down", "begin...")
-        initialFill(recyclerView)
-
-        //
-        // Initial loading the adapter performed on the first layout change to avoid inconsistency
-        // when an update occurs during a layout phase
-        //
-        recyclerView.addOnLayoutChangeListener(object : View.OnLayoutChangeListener {
-            override fun onLayoutChange(
-                v: View?,
-                left: Int,
-                top: Int,
-                right: Int,
-                bottom: Int,
-                oldLeft: Int,
-                oldTop: Int,
-                oldRight: Int,
-                oldBottom: Int
-            ) {
-                recyclerView.removeOnLayoutChangeListener(this)
-                logger.log(TAG, "Initial Fill Down", "On Layout")
-
-                initialFill(recyclerView)
-            }
-        })
-    }
-
-    private fun initialFill(recyclerView: RecyclerView) {
-        var lastTimeVisibleItemPos = Int.MIN_VALUE
-
-        loadingStrategy.load(lifecycleOwner, data)
-
-        { hasMore ->
-            val lastPos =
-                (recyclerView.layoutManager as LinearLayoutManager).findLastCompletelyVisibleItemPosition()
-            logger.log(
-                TAG,
-                "Initial Fill Down",
-                "last visible item pos: $lastPos, previously: $lastTimeVisibleItemPos"
-            )
-            when {
-                canLoadMoreDescriptions(hasMore, lastPos, lastTimeVisibleItemPos) -> {
-                    logger.log(TAG, "Initial Fill Down", "fill more...")
-                    lastTimeVisibleItemPos = lastPos
-                    true
-                }
-                else -> {
-                    logger.log(TAG, "Initial Fill Down", "Complete")
-                    onInitialFill()
-                    false
-                }
-            }
-        }
-    }
-
-    private fun canLoadMoreDescriptions(hasMore: Boolean, lastPos: Int, lastTimeVisibleItemPos: Int) =
-        hasMore && lastPos != lastTimeVisibleItemPos
-
-    override fun getItemCount(): Int {
-        return data.numItemsLoaded()
-    }
-
-    override fun onCreateViewHolder(viewGroup: ViewGroup, viewType: Int): JubakoViewHolder<Any> {
-
-        val factory = data.viewHolderFactories.get(viewType)
-
-        val holder = factory.createViewHolder(viewGroup)
+        val holder = factory.createViewHolder(parent)
         holder.logger = logger
 
         logger.log(
@@ -118,17 +53,17 @@ open class JubakoAdapter(
         return holder
     }
 
-    override fun onBindViewHolder(holder: JubakoViewHolder<Any>, position: Int) {
-        logger.log(TAG, "Bind ViewHolder")
+    override fun getItemCountActual(): Int = data.numItemsLoaded()
+    override fun getCurrentState(): PaginatedDataState<*> = state
+    override fun loadMore() = load()
+    override fun hasMoreToLoad(): Boolean = hasMore
 
-        val item = data.getItem(position)
+    override fun getItem(position: Int): ContentDescription<Any> = data.getItem(position)
 
+    override fun bindItemToHolder(holder: JubakoViewHolder<Any>, item: ContentDescription<Any>) {
         holder.onClickDelegate = { postViewHolderEvent(Event.Click(item.id, it)) }
-
         attachReloader(item, holder)
-
         bindWhenNewOrDefault(item, holder)
-
         onViewHolderBound(holder)
     }
 
@@ -139,6 +74,16 @@ open class JubakoAdapter(
             holder.bind(data)
             holder.data = data
         }
+    }
+
+    override fun onFilled() = onInitialFill()
+
+    private fun load() = loadingStrategy.load(
+        lifecycleOwner, data
+    ) { newState, more ->
+        hasMore = more
+        onStateChanged(newState, state)
+        state = newState
     }
 
     private fun attachReloader(item: ContentDescription<Any>, holder: JubakoViewHolder<Any>) {
@@ -159,33 +104,8 @@ open class JubakoAdapter(
         }
     }
 
-    override fun getItemViewType(position: Int): Int {
+    override fun getItemViewTypeActual(position: Int): Int {
         return data.getItemViewType(position)
-    }
-
-    private var scrollListener: RecyclerView.OnScrollListener? = null
-
-    private fun setupLoadMoreScrollTrigger(recyclerView: RecyclerView) {
-        if (scrollListener != null) {
-            recyclerView.removeOnScrollListener(scrollListener!!)
-            scrollListener = null
-        }
-
-        scrollListener = object : RecyclerView.OnScrollListener() {
-            override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
-                val offset = recyclerView.computeVerticalScrollOffset()
-                val range = recyclerView.computeVerticalScrollRange() - recyclerView.computeVerticalScrollExtent()
-                if (range != 0 && offset > range * 0.8f) {
-                    logger.log(TAG, "Scroll Trigger Load")
-                    loadingStrategy.load(lifecycleOwner, data) {
-                        logger.log(TAG, "Scroll Trigger Load Complete")
-                        false
-                    }
-                }
-            }
-        }
-
-        recyclerView.addOnScrollListener(scrollListener!!)
     }
 
     fun reload(contentDescriptionId: String, payload: Any? = null) {
@@ -200,13 +120,8 @@ open class JubakoAdapter(
         }
     }
 
-    override fun getItemId(position: Int): Long {
-        return data.getItemId(position)
-    }
-
-    private fun postViewHolderEvent(event: Event) {
-        onViewHolderEvent(event)
-    }
+    override fun getItemId(position: Int): Long = data.getItemId(position)
+    private fun postViewHolderEvent(event: Event) = onViewHolderEvent(event)
 
     var onViewHolderEvent: (event: Event) -> Unit = { }
 }

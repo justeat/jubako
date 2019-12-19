@@ -1,69 +1,74 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/sampleHelloButton"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/button_sample_hello" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <Button
-        android:id="@+id/sampleSimpleCarousels"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/button_sample_simple_carousels" />
+        <Button
+            android:id="@+id/sampleHelloButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/button_sample_hello" />
 
-    <Button
-        android:id="@+id/sampleLoadAsync"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/button_sample_load_async" />
+        <Button
+            android:id="@+id/sampleSimpleCarousels"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sample_simple_carousels" />
 
-    <Button
-        android:id="@+id/sampleRowUpdates"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/button_sample_row_updates" />
+        <Button
+            android:id="@+id/sampleLoadAsync"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sample_load_async" />
 
-    <Button
-        android:id="@+id/sampleSelfUpdatingItems"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/button_sample_self_updating_items" />
+        <Button
+            android:id="@+id/sampleRowUpdates"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sample_row_updates" />
 
-    <Button
-        android:id="@+id/sampleEnterpriseHello"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/button_sample_enterprise_hello" />
+        <Button
+            android:id="@+id/sampleSelfUpdatingItems"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sample_self_updating_items" />
 
-    <Button
-        android:id="@+id/sampleMovies"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/button_sample_movies" />
+        <Button
+            android:id="@+id/sampleEnterpriseHello"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sample_enterprise_hello" />
 
-    <Button
-        android:id="@+id/sampleInfiniteHello"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/button_infinite_hello" />
+        <Button
+            android:id="@+id/sampleMovies"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sample_movies" />
 
-    <Button
-        android:id="@+id/sampleGridFill"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/button_sample_grid_fill" />
-</LinearLayout>
+        <Button
+            android:id="@+id/sampleInfiniteHello"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_infinite_hello" />
+
+        <Button
+            android:id="@+id/sampleGridFill"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/button_sample_grid_fill" />
+    </LinearLayout>
+</ScrollView>

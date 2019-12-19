@@ -11,7 +11,6 @@ import com.justeat.jubako.SimpleJubakoAssembler
 fun Jubako.load(descriptionProviders: ListReceiver) {
     load(SimpleJubakoAssembler(descriptionProviders.apply { invoke(mutableListOf()) }))
 }
-
 /**
  * Same as [load] but happens on the IO dispatcher (use with caution!)
  */

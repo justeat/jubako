@@ -16,7 +16,7 @@ open class SimpleJubakoAssembler(private val delegate: (MutableList<ContentDescr
     /**
      * Just add [ContentDescriptionProvider]s to the given list, easy
      */
-    open fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {}
+    open suspend fun onAssemble(list: MutableList<ContentDescriptionProvider<Any>>) {}
 
     open fun MutableList<ContentDescriptionProvider<Any>>.add(provider: ContentDescriptionProvider<*>) {
         add(provider as ContentDescriptionProvider<Any>)

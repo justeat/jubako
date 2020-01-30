@@ -110,9 +110,9 @@ class MoviesActivity : AppCompatActivity() {
     data class Movie(val assetUri: Uri)
 
     class MovieRepository(val app: Application) {
-        private val list1 = app.assets.list("1").map { Movie("${ASSETS_FILE_PATH}1/$it".toUri()) }
-        private val list2 = app.assets.list("2").map { Movie("${ASSETS_FILE_PATH}2/$it".toUri()) }
-        private val list3 = app.assets.list("3").map { Movie("${ASSETS_FILE_PATH}3/$it".toUri()) }
+        private val list1 = app.assets.list("1")!!.map { Movie("${ASSETS_FILE_PATH}1/$it".toUri()) }
+        private val list2 = app.assets.list("2")!!.map { Movie("${ASSETS_FILE_PATH}2/$it".toUri()) }
+        private val list3 = app.assets.list("3")!!.map { Movie("${ASSETS_FILE_PATH}3/$it".toUri()) }
 
         fun getMovies(): List<MovieGroup> {
             return listOf(

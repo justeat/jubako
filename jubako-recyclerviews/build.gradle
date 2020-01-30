@@ -4,7 +4,7 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: 'com.github.dcendents.android-maven'
 
 group = 'com.github.justeat'
-version = "0.50"
+version = "0.61"
 
 android {
     compileSdkVersion 29

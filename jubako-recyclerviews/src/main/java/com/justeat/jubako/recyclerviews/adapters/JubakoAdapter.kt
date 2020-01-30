@@ -6,6 +6,7 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.ContentDescription
 import com.justeat.jubako.Jubako
+import com.justeat.jubako.JubakoViewSpec
 import com.justeat.jubako.data.PaginatedDataState
 import com.justeat.jubako.recyclerviews.ContentLoadingStrategy
 import com.justeat.jubako.recyclerviews.CreateViewHolderDelegate
@@ -30,7 +31,7 @@ open class JubakoAdapter(
     var hasMore: Boolean = true
     var state = PaginatedDataState<ContentDescription<Any>>(listOf(), listOf(), true, null, false)
 
-    interface HolderFactory<T> {
+    interface HolderFactory<T> : JubakoViewSpec<T> {
         fun createViewHolder(parent: ViewGroup): JubakoViewHolder<T>
     }
 

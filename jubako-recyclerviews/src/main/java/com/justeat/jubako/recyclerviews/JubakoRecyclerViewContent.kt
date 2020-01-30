@@ -175,7 +175,7 @@ fun <DATA, HOLDER : JubakoRecyclerViewHolder<DATA, ITEM_DATA, ITEM_HOLDER>, ITEM
     }
 
     return ContentDescription(
-        viewSpec = com.justeat.jubako.recyclerviews.viewHolderFactory { parent ->
+        viewSpec = viewHolderFactory { parent ->
             viewHolder(parent).also { holder ->
                 @Suppress("UNCHECKED_CAST")
                 holder.viewBinder = viewBinder as (Any) -> Unit

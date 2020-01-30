@@ -2,7 +2,7 @@ package com.justeat.jubako
 
 import androidx.lifecycle.LiveData
 import com.justeat.jubako.data.EmptyLiveData
-import java.util.*
+import java.util.UUID
 
 /**
  * Describes a generic piece of asynchronous content declaring its [data] and
@@ -13,7 +13,7 @@ data class ContentDescription<T>(
      * A view spec that will be used to create a UI to
      * present your [data]
      */
-    val viewSpec: Any,
+    val viewSpec: JubakoViewSpec<T>,
     /**
      * Assign the [data] that will be observed and passed to [JubakoViewHolder.bind]
      */

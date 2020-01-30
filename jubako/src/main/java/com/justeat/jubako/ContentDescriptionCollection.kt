@@ -12,13 +12,9 @@ class ContentDescriptionCollection(var listener: Listener? = null) {
         fun notifyItemRangeRemoved(positionStart: Int, itemCount: Int)
     }
 
-    operator fun get(index: Int): ContentDescription<Any> {
-        return descriptions[index] as ContentDescription<Any>
-    }
+    operator fun get(index: Int): ContentDescription<Any> = descriptions[index] as ContentDescription<Any>
 
-    fun size(): Int {
-        return descriptions.size
-    }
+    fun size(): Int = descriptions.size
 
     fun clear() {
         val size = descriptions.size
@@ -39,9 +35,7 @@ class ContentDescriptionCollection(var listener: Listener? = null) {
         notifyItemChanged(index)
     }
 
-    fun contains(description: ContentDescription<*>): Boolean {
-        return descriptions.contains(description)
-    }
+    fun contains(description: ContentDescription<*>): Boolean = descriptions.contains(description)
 
     private fun notifyItemChanged(index: Int) {
         listener?.notifyItemChanged(index, descriptions[index])

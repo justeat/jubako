@@ -6,6 +6,7 @@ import androidx.annotation.IdRes
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.ContentDescription
 import com.justeat.jubako.Jubako
+import com.justeat.jubako.recyclerviews.adapters.JubakoAdapter
 
 /**
  * Like a standard [RecyclerView.ViewHolder] with some extra Jubako features
@@ -50,8 +51,8 @@ abstract class JubakoViewHolder<T>(itemView: View) : RecyclerView.ViewHolder(ite
 /**
  * Simple way to construct a [JubakoAdapter.HolderFactory]
  */
-fun <T> viewHolderFactory(delegate: (parent: ViewGroup) -> JubakoViewHolder<T>): com.justeat.jubako.recyclerviews.adapters.JubakoAdapter.HolderFactory<T> {
-    return object : com.justeat.jubako.recyclerviews.adapters.JubakoAdapter.HolderFactory<T> {
+fun <T> viewHolderFactory(delegate: (parent: ViewGroup) -> JubakoViewHolder<T>): JubakoAdapter.HolderFactory<T> {
+    return object : JubakoAdapter.HolderFactory<T> {
         override fun createViewHolder(parent: ViewGroup) = delegate(parent)
     }
 }

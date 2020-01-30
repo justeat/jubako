@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import com.justeat.jubako.ContentDescription
 import com.justeat.jubako.ContentDescriptionProvider
 import com.justeat.jubako.JubakoAssembler
+import com.justeat.jubako.JubakoViewSpec
 import com.justeat.jubako.data.EmptyLiveData
 import com.justeat.jubako.descriptionProvider
 import java.util.UUID
@@ -29,7 +30,7 @@ fun <T> JubakoMutableList.add(delegate: () -> ContentDescription<T>) {
 }
 
 fun <T> JubakoMutableList.addDescription(
-    viewSpec: Any,
+    viewSpec: JubakoViewSpec<T>,
     data: LiveData<T> = EmptyLiveData(),
     onReload: (ContentDescription<T>.(payload: Any?) -> Unit) = { },
     id: String = UUID.randomUUID().toString()

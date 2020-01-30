@@ -31,18 +31,11 @@ open class Jubako : ViewModel(), CoroutineScope {
         private val assembler: JubakoAssembler,
         val source: MutableList<ContentDescription<Any>> = mutableListOf(),
         val destination: ContentDescriptionCollection = ContentDescriptionCollection(),
-        val viewSpecs: MutableList<Any> = mutableListOf(),
-        val viewTypes: MutableList<String> = mutableListOf()
+        val viewSpecs: MutableList<Any> = mutableListOf()
     ) {
 
         @VisibleForTesting
         internal var loadingJob: Job? = null
-
-        fun getItemViewType(position: Int): Int =
-            viewTypes.indexOf(destination[position].id)
-
-        fun getItemId(position: Int): Long =
-            viewTypes.indexOf(destination[position].id).toLong()
 
         fun getItem(position: Int) = destination[position]
         fun numItemsLoaded() = destination.size()
@@ -171,6 +164,5 @@ private suspend fun Jubako.Data.load(contentAssembler: JubakoAssembler) {
         val description = it.createDescription()
         source.add(description)
         viewSpecs.add(description.viewSpec)
-        viewTypes.add(description.id)
     }
 }

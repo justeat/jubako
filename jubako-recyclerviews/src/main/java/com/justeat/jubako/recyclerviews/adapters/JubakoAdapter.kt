@@ -49,7 +49,7 @@ open class JubakoAdapter(
         logger.log(
             TAG,
             "Create View Holder",
-            "id: ${data.viewTypes[viewType]}, viewType: $viewType, type: ${holder.javaClass.simpleName}"
+            "viewType: $viewType, type: ${holder.javaClass.simpleName}"
         )
         return holder
     }
@@ -106,7 +106,7 @@ open class JubakoAdapter(
     }
 
     override fun getItemViewTypeActual(position: Int): Int {
-        return data.getItemViewType(position)
+        return position
     }
 
     fun reload(contentDescriptionId: String, payload: Any? = null) {
@@ -121,7 +121,7 @@ open class JubakoAdapter(
         }
     }
 
-    override fun getItemId(position: Int): Long = data.getItemId(position)
+    override fun getItemId(position: Int): Long = position.toLong()
     private fun postViewHolderEvent(event: JubakoViewHolder.Event) = onViewHolderEvent(event)
 
     var onViewHolderEvent: (event: JubakoViewHolder.Event) -> Unit = { }

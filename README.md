@@ -51,7 +51,7 @@ The best place to start right now with Jubako is to check it the examples in the
 
 ## Gradle Dependencies
 Add the following repository to your root gradle file
-```
+```gradle
 allprojects {
     repositories {
         ...

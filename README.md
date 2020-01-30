@@ -54,7 +54,6 @@ Add the following repository to your root gradle file
 ```gradle
 allprojects {
     repositories {
-        ...
         maven { url 'https://jitpack.io' }
 
     }

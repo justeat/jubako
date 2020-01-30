@@ -51,7 +51,7 @@ The best place to start right now with Jubako is to check it the examples in the
 
 ## Gradle Dependencies
 Add the following dependencies to your project gradle file
-```
+```gradle
 implementation 'com.github.justeat.jubako:jubako:0.61'
 implementation 'com.github.justeat.jubako:jubako-recyclerviews:0.61'
 ```

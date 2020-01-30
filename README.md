@@ -50,6 +50,16 @@ The best place to start right now with Jubako is to check it the examples in the
 **Documentation is rough right now so the best place to begin would be to run & study the examples https://github.com/justeat/jubako/tree/master/jubako-sample**
 
 ## Gradle Dependencies
+Add the following repository to your root gradle file
+```
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+
+    }
+}
+```
 Add the following dependencies to your project gradle file
 ```gradle
 implementation 'com.github.justeat.jubako:jubako:0.61'

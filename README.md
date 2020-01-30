@@ -7,8 +7,6 @@
 Jubako makes things super simple to assemble rich content into a <code>RecyclerView</code> such as a wall of carousels (Google Play style recycler in recyclers). Jubako can load content on the fly asynchronously, infinitely with pagination.
 
 
-
-
 ## The simplest example - "Hello Jubako! x 100"
 ```kotlin
 class HelloJubakoActivity : AppCompatActivity() {
@@ -50,6 +48,14 @@ construction to support more complicated scenarios.**
 The best place to start right now with Jubako is to check it the examples in the `jubako-sample` app in this repository.
 
 **Documentation is rough right now so the best place to begin would be to run & study the examples https://github.com/justeat/jubako/tree/master/jubako-sample**
+
+## Gradle Dependencies
+Add the following dependencies to your project gradle file
+```
+implementation 'com.github.justeat.jubako:jubako:0.61'
+implementation 'com.github.justeat.jubako:jubako-recyclerviews:0.61'
+```
+
 ## Describing content
 For each row in Jubako is a `ContentDescription` that defines which view holder to use and which data to bind (in the form of `LiveData<T>`).
 
@@ -70,7 +76,7 @@ class HelloContentDescriptionProvider(private val language: Language) : ContentD
                 ENGLISH -> service.getHelloEnglish()
                 JAPANESE -> service.getHelloJapanese()
             },
-            viewHolderFactory = HelloViewHolderFactory()
+            viewSpec = HelloViewHolderFactory()
         )
     }
 }
@@ -81,8 +87,8 @@ A description has various properties of which some are required.
 A unique ID that represents this row (use `UUID` to create one to keep things unique if a
 specific name is not important)
 
-#### viewHolderFactory: JubakoAdapter.HolderFactory<T> (required)
-A factory class that will create a ViewHolder that you want to use when rendering.
+#### viewSpec: Any (required)
+A `JubakoAdapter.HolderFactory<T>` factory class that will create a `ViewHolder` that you want to use when rendering (the type is currently `Any` to possibly support other UI frameworks such as Jetpack Compose
 
 #### data: LiveData<T>? (required)
 The data that will be loaded where T can be any type, later on when rendering this data (when loaded) will be passed to your
@@ -95,7 +101,7 @@ When Jubako observes your data it expects you to `postValue` when your data is r
 
 ```kotlin
 ContentDescription(
-    viewHolderFactory = TestViewHolderFactory(),
+    viewSpec = TestViewHolderFactory(),
     data = object : LiveData<String>() {
         override fun onActive() {
             thread {
@@ -121,7 +127,7 @@ In an enterprise implementation it would be common to assign data with the resul
 
 ```kotlin
 ContentDescription(
-    viewHolderFactory = TestViewHolderFactory(),
+    viewSpec = TestViewHolderFactory(),
     data = repository.getData()
     })
 ```
@@ -250,7 +256,7 @@ with a new `LiveData<T>` as follows:-
 ```kotlin
 ContentDescription(
     id = SOME_UNIQUE_ID,
-    viewHolderFactory = TestViewHolderFactory(),
+    viewSpec = TestViewHolderFactory(),
     data = object : LiveData<String>() {
         override fun onActive() {
             thread {

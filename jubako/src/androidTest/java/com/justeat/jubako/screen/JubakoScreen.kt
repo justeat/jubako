@@ -7,7 +7,7 @@ import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import com.justeat.jubako.JubakoViewHolder
+import com.justeat.jubako.recyclerviews.JubakoViewHolder
 import com.justeat.jubako.test.R
 import com.justeat.jubako.util.RecyclerViewExt.withRecyclerView
 import org.hamcrest.Matchers
@@ -30,7 +30,7 @@ object JubakoScreen {
 
     fun scrollToTop() {
         onView(withId(R.id.recyclerView))
-            .perform(RecyclerViewActions.scrollToPosition<JubakoViewHolder<Any>>(0))
+            .perform(RecyclerViewActions.scrollToPosition<com.justeat.jubako.recyclerviews.JubakoViewHolder<Any>>(0))
     }
 
     fun clickDoButton() {

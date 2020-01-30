@@ -12,7 +12,7 @@ class TestContentDescriptionProvider(
     override fun createDescription(): ContentDescription<String> {
         return ContentDescription(
             id = id,
-            viewHolderFactory = TestViewHolderFactory(),
+            viewSpec = TestViewHolderFactory(),
             data = object : LiveData<String>() {
                 override fun onActive() {
                     postValue(data)

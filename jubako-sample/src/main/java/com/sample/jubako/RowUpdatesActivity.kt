@@ -9,12 +9,12 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.JubakoAdapter
-import com.justeat.jubako.JubakoViewHolder
 import com.justeat.jubako.extensions.addDescription
 import com.justeat.jubako.extensions.load
-import com.justeat.jubako.extensions.withJubako
-import com.justeat.jubako.viewHolderFactory
+import com.justeat.jubako.recyclerviews.JubakoViewHolder
+import com.justeat.jubako.recyclerviews.adapters.JubakoAdapter
+import com.justeat.jubako.recyclerviews.viewHolderFactory
+import com.justeat.jubako.recyclerviews.withJubako
 import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 
 class RowUpdatesActivity : AppCompatActivity() {
@@ -40,7 +40,7 @@ class RowUpdatesActivity : AppCompatActivity() {
                     onReload = {
                         hello = hello.plus(hello.first()).drop(1)
                     },
-                    viewHolderFactory = viewHolderFactory {
+                    viewSpec = viewHolderFactory {
                         object : JubakoViewHolder<String>(textView()) {
                             override fun bind(data: String?) {
                                 (itemView as TextView).text = data

@@ -5,7 +5,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.JubakoAdapter
+import com.justeat.jubako.recyclerviews.adapters.JubakoAdapter
 import com.justeat.jubako.test.R
 
 class TestJubakoActivity : AppCompatActivity() {
@@ -26,7 +26,7 @@ class TestJubakoActivity : AppCompatActivity() {
     }
 
     private fun bindAdapter(data: Jubako.Data) {
-        val contentAdapter = JubakoAdapter(
+        val contentAdapter = com.justeat.jubako.recyclerviews.adapters.JubakoAdapter(
             lifecycleOwner = this,
             data = data
         )

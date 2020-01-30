@@ -13,11 +13,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.ContentDescriptionProvider
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.SimpleJubakoAssembler
-import com.justeat.jubako.adapters.ProgressView
 import com.justeat.jubako.data.PaginatedLiveData
-import com.justeat.jubako.extensions.addRecyclerView
-import com.justeat.jubako.extensions.pageSize
-import com.justeat.jubako.extensions.withJubako
+import com.justeat.jubako.recyclerviews.adapters.ProgressView
+import com.justeat.jubako.recyclerviews.addRecyclerView
+import com.justeat.jubako.recyclerviews.pageSize
+import com.justeat.jubako.recyclerviews.withJubako
 import kotlinx.android.synthetic.main.activity_grid_fill.errorRates
 import kotlinx.android.synthetic.main.activity_grid_fill.reloadVButton
 import kotlinx.android.synthetic.main.activity_grid_fill.tileSize

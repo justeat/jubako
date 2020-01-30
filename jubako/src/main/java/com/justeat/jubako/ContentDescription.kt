@@ -6,14 +6,14 @@ import java.util.*
 
 /**
  * Describes a generic piece of asynchronous content declaring its [data] and
- * UI via a [viewHolderFactory].
+ * UI via a [viewSpec].
  */
 data class ContentDescription<T>(
     /**
-     * A view holder factory that will be used to create a [JubakoViewHolder] to
+     * A view spec that will be used to create a UI to
      * present your [data]
      */
-    val viewHolderFactory: JubakoAdapter.HolderFactory<T>,
+    val viewSpec: Any,
     /**
      * Assign the [data] that will be observed and passed to [JubakoViewHolder.bind]
      */

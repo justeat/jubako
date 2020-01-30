@@ -18,7 +18,7 @@
             android:layout_gravity="center" />
     </FrameLayout>
 
-    <com.justeat.jubako.widgets.JubakoRecyclerView
+    <com.justeat.jubako.recyclerviews.widgets.JubakoRecyclerView
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

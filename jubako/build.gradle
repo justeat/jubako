@@ -36,7 +36,6 @@ dependencies {
     implementation "androidx.appcompat:appcompat:$androidx_version"
     implementation "androidx.core:core-ktx:$androidx_version"
 
-    api "androidx.recyclerview:recyclerview:$androidx_version"
     api "androidx.lifecycle:lifecycle-extensions:$arch_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines_version"
     api "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines_version"

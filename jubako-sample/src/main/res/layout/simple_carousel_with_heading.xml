@@ -17,7 +17,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.justeat.jubako.widgets.JubakoCarouselRecyclerView
+    <com.justeat.jubako.recyclerviews.widgets.JubakoCarouselRecyclerView
         android:id="@+id/jubakoCarousel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

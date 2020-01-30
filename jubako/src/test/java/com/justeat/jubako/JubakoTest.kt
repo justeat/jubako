@@ -3,7 +3,6 @@ package com.justeat.jubako
 import android.view.ViewGroup
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.MutableLiveData
-import com.justeat.jubako.extensions.add
 import com.nhaarman.mockitokotlin2.capture
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -55,7 +54,7 @@ class JubakoTest {
         (assembleCaptor.value as Jubako.State.Assembled).let {
             val data = it.data
             assertEquals(MOCK_CONTENT_DESCRIPTION, data.source[0])
-            assertEquals(MOCK_HOLDER_FACTORY, data.viewHolderFactories[0])
+            assertEquals(MOCK_HOLDER_FACTORY, data.viewSpecs[0])
             assertEquals(MOCK_CONTENT_DESCRIPTION_ID, data.viewTypes[0])
         }
     }
@@ -125,10 +124,10 @@ private val MOCK_ASSEMBLER = SimpleJubakoAssembler {
 }
 
 private const val MOCK_CONTENT_DESCRIPTION_ID = "abc-123"
-private val MOCK_HOLDER_FACTORY = object : JubakoAdapter.HolderFactory<String> {
+private val MOCK_HOLDER_FACTORY = object : com.justeat.jubako.recyclerviews.adapters.JubakoAdapter.HolderFactory<String> {
     override fun createViewHolder(parent: ViewGroup) = null!!
 }
 private val MOCK_CONTENT_DESCRIPTION = ContentDescription(
     id = MOCK_CONTENT_DESCRIPTION_ID,
-    viewHolderFactory = MOCK_HOLDER_FACTORY
+    viewSpec = MOCK_HOLDER_FACTORY
 )

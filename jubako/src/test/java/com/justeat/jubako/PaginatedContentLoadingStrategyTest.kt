@@ -28,13 +28,13 @@ class PaginatedContentLoadingStrategyTest {
     @Test
     @Throws(Exception::class)
     fun load_loads_page_at_a_time() {
-        val paginatedLoadingStrategy = PaginatedContentLoadingStrategy(5)
+        val paginatedLoadingStrategy = com.justeat.jubako.recyclerviews.adapters.PaginatedContentLoadingStrategy(5)
 
         val data = Jubako.Data(scope, assembler)
 
         repeat((0..21).count()) {
-            data.source.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
-                override fun createViewHolder(parent: ViewGroup): JubakoViewHolder<String> = null!!
+            data.source.add(ContentDescription(object : com.justeat.jubako.recyclerviews.adapters.JubakoAdapter.HolderFactory<String> {
+                override fun createViewHolder(parent: ViewGroup): com.justeat.jubako.recyclerviews.JubakoViewHolder<String> = null!!
             }) as ContentDescription<Any>)
         }
 

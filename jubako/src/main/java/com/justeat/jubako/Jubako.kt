@@ -31,7 +31,7 @@ open class Jubako : ViewModel(), CoroutineScope {
         private val assembler: JubakoAssembler,
         val source: MutableList<ContentDescription<Any>> = mutableListOf(),
         val destination: ContentDescriptionCollection = ContentDescriptionCollection(),
-        val viewHolderFactories: MutableList<JubakoAdapter.HolderFactory<Any>> = mutableListOf(),
+        val viewSpecs: MutableList<Any> = mutableListOf(),
         val viewTypes: MutableList<String> = mutableListOf()
     ) {
 
@@ -170,7 +170,7 @@ private suspend fun Jubako.Data.load(contentAssembler: JubakoAssembler) {
     descriptionProviders.forEach {
         val description = it.createDescription()
         source.add(description)
-        viewHolderFactories.add(description.viewHolderFactory)
+        viewSpecs.add(description.viewSpec)
         viewTypes.add(description.id)
     }
 }

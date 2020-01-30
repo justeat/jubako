@@ -8,8 +8,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.justeat.jubako.ContentDescriptionProvider
 import com.justeat.jubako.Jubako
 import com.justeat.jubako.SimpleJubakoAssembler
-import com.justeat.jubako.extensions.addView
-import com.justeat.jubako.extensions.withJubako
+import com.justeat.jubako.recyclerviews.addView
+import com.justeat.jubako.recyclerviews.withJubako
 import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 
 class InfiniteHelloJubakoActivity : AppCompatActivity() {

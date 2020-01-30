@@ -11,14 +11,14 @@ class ContentDescriptionCollectionTest {
         val collection = ContentDescriptionCollection()
 
         val descriptions = mutableListOf<ContentDescription<*>>()
-        descriptions.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
-            override fun createViewHolder(parent: ViewGroup): JubakoViewHolder<String> = null!!
+        descriptions.add(ContentDescription(object : com.justeat.jubako.recyclerviews.adapters.JubakoAdapter.HolderFactory<String> {
+            override fun createViewHolder(parent: ViewGroup): com.justeat.jubako.recyclerviews.JubakoViewHolder<String> = null!!
         }))
-        descriptions.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
-            override fun createViewHolder(parent: ViewGroup): JubakoViewHolder<String> = null!!
+        descriptions.add(ContentDescription(object : com.justeat.jubako.recyclerviews.adapters.JubakoAdapter.HolderFactory<String> {
+            override fun createViewHolder(parent: ViewGroup): com.justeat.jubako.recyclerviews.JubakoViewHolder<String> = null!!
         }))
-        descriptions.add(ContentDescription(object : JubakoAdapter.HolderFactory<String> {
-            override fun createViewHolder(parent: ViewGroup): JubakoViewHolder<String> = null!!
+        descriptions.add(ContentDescription(object : com.justeat.jubako.recyclerviews.adapters.JubakoAdapter.HolderFactory<String> {
+            override fun createViewHolder(parent: ViewGroup): com.justeat.jubako.recyclerviews.JubakoViewHolder<String> = null!!
         }))
 
         collection.addAll(descriptions)

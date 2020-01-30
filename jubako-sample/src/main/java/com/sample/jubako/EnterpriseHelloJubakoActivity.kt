@@ -13,8 +13,8 @@ import com.justeat.jubako.Jubako
 import com.justeat.jubako.Jubako.State.AssembleError
 import com.justeat.jubako.Jubako.State.Assembled
 import com.justeat.jubako.Jubako.State.Assembling
-import com.justeat.jubako.JubakoAdapter
-import com.justeat.jubako.JubakoViewHolder
+import com.justeat.jubako.recyclerviews.adapters.JubakoAdapter
+import com.justeat.jubako.recyclerviews.JubakoViewHolder
 import com.justeat.jubako.SimpleJubakoAssembler
 import com.sample.jubako.EnterpriseHelloJubakoActivity.HelloContentDescriptionProvider.Language.ENGLISH
 import com.sample.jubako.EnterpriseHelloJubakoActivity.HelloContentDescriptionProvider.Language.JAPANESE
@@ -87,7 +87,7 @@ class EnterpriseHelloJubakoActivity : AppCompatActivity() {
                     ENGLISH -> service.getHelloEnglish()
                     JAPANESE -> service.getHelloJapanese()
                 },
-                viewHolderFactory = HelloViewHolderFactory()
+                viewSpec = HelloViewHolderFactory()
             )
         }
 

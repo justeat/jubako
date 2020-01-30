@@ -14,12 +14,12 @@ import androidx.core.view.isGone
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.adapters.JubakoRecyclerViewHolder
 import com.justeat.jubako.data.InstantLiveData
-import com.justeat.jubako.extensions.addRecyclerView
-import com.justeat.jubako.extensions.addView
 import com.justeat.jubako.extensions.loadAsync
-import com.justeat.jubako.extensions.withJubako
+import com.justeat.jubako.recyclerviews.adapters.JubakoRecyclerViewHolder
+import com.justeat.jubako.recyclerviews.addRecyclerView
+import com.justeat.jubako.recyclerviews.addView
+import com.justeat.jubako.recyclerviews.withJubako
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.activity_jubako_recycler.loadingIndicator
 import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView

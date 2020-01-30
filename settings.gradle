@@ -1,1 +1,1 @@
-include ':jubako-sample', ':jubako'
+include ':jubako-sample', ':jubako', ':jubako-recyclerviews'

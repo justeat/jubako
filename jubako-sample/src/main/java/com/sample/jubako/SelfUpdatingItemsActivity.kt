@@ -7,11 +7,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.JubakoViewHolder
 import com.justeat.jubako.extensions.addDescription
 import com.justeat.jubako.extensions.load
-import com.justeat.jubako.extensions.withJubako
-import com.justeat.jubako.viewHolderFactory
+import com.justeat.jubako.recyclerviews.JubakoViewHolder
+import com.justeat.jubako.recyclerviews.viewHolderFactory
+import com.justeat.jubako.recyclerviews.withJubako
 import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 
 class SelfUpdatingItemsActivity : AppCompatActivity() {
@@ -26,7 +26,7 @@ class SelfUpdatingItemsActivity : AppCompatActivity() {
             for (i in 0..100) {
                 var counter = 0
                 addDescription(
-                    viewHolderFactory = viewHolderFactory { CountingViewHolder(it) },
+                    viewSpec = viewHolderFactory { CountingViewHolder(it) },
                     data = object : LiveData<Int>() {
                         override fun onActive() {
                             postValue(counter)

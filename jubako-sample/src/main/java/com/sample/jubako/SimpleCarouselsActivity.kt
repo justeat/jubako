@@ -8,10 +8,10 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LiveData
 import androidx.recyclerview.widget.RecyclerView
 import com.justeat.jubako.Jubako
-import com.justeat.jubako.extensions.addRecyclerView
 import com.justeat.jubako.extensions.load
-import com.justeat.jubako.extensions.pageSize
-import com.justeat.jubako.extensions.withJubako
+import com.justeat.jubako.recyclerviews.addRecyclerView
+import com.justeat.jubako.recyclerviews.pageSize
+import com.justeat.jubako.recyclerviews.withJubako
 import kotlinx.android.synthetic.main.activity_jubako_recycler.recyclerView
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
